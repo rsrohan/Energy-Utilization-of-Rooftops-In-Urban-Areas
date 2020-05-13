@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">MINOR PROJECT 2</string>
+    <string name="sotw_north">NORTH</string>
+    <string name="sotw_northeast">NORTH-EAST</string>
+    <string name="sotw_east">EAST</string>
+    <string name="sotw_southeast">SOUTH-EAST</string>
+    <string name="sotw_south">SOUTH</string>
+    <string name="sotw_southwest">SOUTH-WEST</string>
+    <string name="sotw_west">WEST</string>
+    <string name="sotw_northwest">NORTH-WEST</string>
+    <string name="tap_to_input_west_facing_image">tap to input west facing image</string>
+    <string name="tap_to_input_east_facing_image">Tap to input east facing image</string>
+    <string name="analyseimages">analyse Images</string>
+    <string name="yourphone">Enter 10 digit phone no.</string>
+    <string name="send_otp">send OTP</string>
+    <string name="verify">verify</string>
+    <string name="resend_otp">resend otp</string>
+    <string name="entermanuallymessage">PLEASE ENTER OTP MANUALLY.</string>
+    <string name="please_wait_while_we_re_detecting_otp_automatically">PLEASE WAIT WHILE WE\'RE DETECTING OTP AUTOMATICALLY.</string>
+    <string name="otp">OTP</string>
+    <string name="cont">continue</string>
+    <string name="entername">Please enter your name</string>
+    <string name="pleasewait">Please wait !</string>
+    <string name="soilDetails">soil details</string>
+</resources>
