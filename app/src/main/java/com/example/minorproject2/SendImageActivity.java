@@ -6,11 +6,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,17 +32,29 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-public class SendImageActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class SendImageActivity extends AppCompatActivity {
 
     private static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 99;
-    private GoogleApiClient mGoogleApiClient;
+    private GoogleApiClient googleApiClient;
     private Location mLastLocation;
 
     Button eastImageButton, westImageButton, analyseImageButton;
@@ -46,61 +62,55 @@ public class SendImageActivity extends AppCompatActivity implements GoogleApiCli
     ImageView eastImage, westImage;
 
     FirebaseUser user;
-    private double latitude=0, longitude=0;
-    private String TAG="tag";
+    private double latitude = 0, longitude = 0;
+    private String TAG = "tag";
     private Button soilDetailButton;
 
     String soilDetail;
+    private int REQUEST_LOCATION = 101;
+    private FusedLocationProviderClient fusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_image);
         user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user==null)
-        {
+        if (user == null) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
         }
         setViewById();
 
         if (checkAndRequestPermissions()) {
-            turnGPSOn();
-
-
-            if (mGoogleApiClient == null) {
-                mGoogleApiClient = new GoogleApiClient.Builder(this)
-                        .addConnectionCallbacks(this)
-                        .addOnConnectionFailedListener(this)
-                        .addApi(LocationServices.API)
-                        .build();
+            if (hasGPSDevice(getApplicationContext())) {
+                enableLoc();
+                getLocation();
             }
-            mGoogleApiClient.connect();
         }
 
-        try{
+        try {
             Uri uri = Uri.parse(getIntent().getStringExtra("path"));
             Glide.with(getApplicationContext()).asBitmap().load(uri).addListener(new RequestListener<Bitmap>() {
                 @Override
                 public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                    Log.d(TAG, "onLoadFailed: "+e);
+                    Log.d(TAG, "onLoadFailed: " + e);
                     return false;
                 }
 
                 @Override
                 public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
                     eastImage.setImageBitmap(resource);
-                    Log.d(TAG, "onResourceReady: "+resource);
+                    Log.d(TAG, "onResourceReady: " + resource);
                     return false;
                 }
             }).submit();
             //eastImage.setImageURI(uri);
-            Log.d(TAG, "onNewIntent: "+uri);
+            Log.d(TAG, "onNewIntent: " + uri);
             eastImage.setVisibility(View.VISIBLE);
-        }catch (Exception e){
-            Log.d(TAG, "onNewIntent: "+e);
+        } catch (Exception e) {
+            Log.d(TAG, "onNewIntent: " + e);
         }
-            eastImageButton.setOnClickListener(new View.OnClickListener() {
+        eastImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), CameraActivity.class).putExtra("requirement", "east"));
@@ -128,8 +138,6 @@ public class SendImageActivity extends AppCompatActivity implements GoogleApiCli
         super.onNewIntent(intent);
 
 
-
-
     }
 
     private void setViewById() {
@@ -140,6 +148,7 @@ public class SendImageActivity extends AppCompatActivity implements GoogleApiCli
         analyseImageButton = findViewById(R.id.submitImageButton);
         soilDetailButton = findViewById(R.id.soilDetails);
     }
+
     private boolean checkAndRequestPermissions() {
         int camera = ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA);
         int storage = ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -166,52 +175,116 @@ public class SendImageActivity extends AppCompatActivity implements GoogleApiCli
         }
         return true;
     }
-    private void turnGPSOn() {
-        String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
 
-        if (!provider.contains("gps")) { //if gps is disabled
-            final Intent poke = new Intent();
-            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
-            poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
-            poke.setData(Uri.parse("3"));
-            sendBroadcast(poke);
+    private boolean hasGPSDevice(Context context) {
+        final LocationManager mgr = (LocationManager) context
+                .getSystemService(Context.LOCATION_SERVICE);
+        if (mgr == null)
+            return false;
+        final List<String> providers = mgr.getAllProviders();
+        if (providers == null)
+            return false;
+        return providers.contains(LocationManager.GPS_PROVIDER);
+    }
 
+    private void enableLoc() {
+
+        if (googleApiClient == null) {
+            googleApiClient = new GoogleApiClient.Builder(SendImageActivity.this)
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                        @Override
+                        public void onConnected(Bundle bundle) {
+
+                        }
+
+                        @Override
+                        public void onConnectionSuspended(int i) {
+                            googleApiClient.connect();
+                        }
+                    })
+                    .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                        @Override
+                        public void onConnectionFailed(ConnectionResult connectionResult) {
+
+                        }
+                    }).build();
+            googleApiClient.connect();
+
+            LocationRequest locationRequest = LocationRequest.create();
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            locationRequest.setInterval(30 * 1000);
+            locationRequest.setFastestInterval(5 * 1000);
+            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                    .addLocationRequest(locationRequest);
+
+            builder.setAlwaysShow(true);
+
+            PendingResult<LocationSettingsResult> result =
+                    LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
+            result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+                @Override
+                public void onResult(LocationSettingsResult result) {
+                    final Status status = result.getStatus();
+                    switch (status.getStatusCode()) {
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            try {
+                                // Show the dialog by calling startResolutionForResult(),
+                                // and check the result in onActivityResult().
+                                status.startResolutionForResult(SendImageActivity.this, REQUEST_LOCATION);
+
+                                //finish();
+                            } catch (IntentSender.SendIntentException e) {
+                                // Ignore the error.
+                            }
+                            break;
+                    }
+                }
+            });
         }
     }
-    private void runLocationTracker() {
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                        mGoogleApiClient);
-                if (mLastLocation != null) {
 
-                    latitude = mLastLocation.getLatitude();
-                    longitude = mLastLocation.getLongitude();
+    private void getLocation() {
+        final LocationManager manager = (LocationManager) SendImageActivity.this.getSystemService(Context.LOCATION_SERVICE);
 
-                }
+        if (manager != null) {
+            if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER) && hasGPSDevice(SendImageActivity.this)) {
+                //Toast.makeText(SendImageActivity.this, "Please turn on GPS", Toast.LENGTH_SHORT).show();
+                enableLoc();
+            } else {
+
+                fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+                fusedLocationClient.getLastLocation()
+                        .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                            @Override
+                            public void onSuccess(Location location) {
+                                // Got last known location. In some rare situations this can be null.
+                                if (location != null) {
+                                    Geocoder gcd = new Geocoder(getApplicationContext(), Locale.getDefault());
+                                    List<Address> addresses = null;
+                                    try {
+                                        addresses = gcd.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                                        if (addresses.size() > 0) {
+                                            Log.d(TAG, "onSuccess: "+addresses.get(0).getPostalCode());
+                                        }
+
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+
+
+                                } else {
+                                    Toast.makeText(SendImageActivity.this, "Something went wrong. ERROR: Location NULL", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
             }
-        }, 5000);
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-
-        runLocationTracker();
-
-    }
-
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-        Toast.makeText(this, ""+connectionResult, Toast.LENGTH_SHORT).show();
+        }
     }
 
 }
