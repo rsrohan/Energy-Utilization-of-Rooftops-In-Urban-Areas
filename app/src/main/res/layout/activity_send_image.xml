@@ -8,6 +8,7 @@
     android:orientation="vertical"
     android:layout_gravity="center"
     android:gravity="center"
+    android:background="#283040"
     tools:context=".SendImageActivity">
 
     <ImageView
@@ -15,7 +16,7 @@
         android:layout_height="200dp"
         android:id="@+id/imageEast"
         android:scaleType="centerCrop"
-        android:visibility="visible"
+        android:visibility="gone"
         />
     <Button
         android:layout_width="wrap_content"
@@ -24,8 +25,8 @@
         android:padding="4dp"
         android:layout_margin="4dp"
         android:textColor="@android:color/white"
-        android:background="@drawable/buttons_colorprimary_bg"
-        android:text="@string/tap_to_input_east_facing_image"
+        android:background="@drawable/ic_write_text"
+        android:text="Tap to input images for all directions"
         />
     <ImageView
         android:layout_width="match_parent"
@@ -39,9 +40,11 @@
         android:id="@+id/imageWestButton"
         android:padding="4dp"
         android:layout_margin="4dp"
+        android:visibility="gone"
         android:textColor="@android:color/white"
-        android:background="@drawable/buttons_colorprimary_bg"
+        android:background="@drawable/ic_write_text"
         android:text="@string/tap_to_input_west_facing_image"
+        android:layout_marginBottom="40dp"
         />
     <Button
         android:layout_width="match_parent"

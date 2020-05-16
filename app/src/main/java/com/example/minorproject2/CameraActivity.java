@@ -33,6 +33,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -48,7 +49,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class CameraActivity extends AppCompatActivity implements SensorEventListener{
+public class CameraActivity extends AppCompatActivity implements SensorEventListener {
     private Camera mCamera;
     private CameraPreview mPreview;
     private String TAG = "Camera";
@@ -58,10 +59,11 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
     ImageView compass;
     SensorManager sensorManager;
     LocationManager locationManager;
+    TextView imageCount;
     float currentDegree = 0f;
-    private double longitude = 0, latitude = 0, prevLatitude= 0, prevLongitude=0;
-
-
+    private double longitude = 0, latitude = 0, prevLatitude = 0, prevLongitude = 0;
+    int count = 1;
+    public static ArrayList<String> images = null;
     boolean firstTimeLocationTrack = true;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -70,18 +72,14 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
+        images = new ArrayList<>();
         capture = findViewById(R.id.capture);
         gallery = findViewById(R.id.gallery);
         switchCam = findViewById(R.id.switchCamera);
         progressBar = findViewById(R.id.progressbar);
         compass = findViewById(R.id.compass);
+        imageCount = findViewById(R.id.imageCount);
 
-//        gallery.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(CameraActivity.this, latitude+" "+longitude, Toast.LENGTH_SHORT).show();
-//            }
-//        });
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -116,8 +114,26 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
                                     fos.close();
                                     //Toast.makeText(CameraActivity.this, "" + pictureFile, Toast.LENGTH_SHORT).show();
                                     progressBar.setVisibility(View.GONE);
-                                    startActivity(new Intent(getApplicationContext(), SendImageActivity.class).putExtra("path", pictureFile.toString()));
-                                    finish();
+                                    images.add(pictureFile.toString());
+                                    count++;
+                                    if (images.size() == 4) {
+                                        startActivity(new Intent(getApplicationContext(), SendImageActivity.class)
+                                                .putExtra("imagesClicked", true)
+                                                .putExtra("image1", images.get(0))
+                                                .putExtra("image2", images.get(1))
+                                                .putExtra("image3", images.get(2))
+                                                .putExtra("image4", images.get(3)));
+                                        finish();
+                                    } else {
+                                        imageCount.setText("Image " + count);
+                                        mCamera = getCameraInstance();
+
+                                        // Create our Preview view and set it as the content of our activity.
+                                        mPreview = new CameraPreview(getApplicationContext(), mCamera);
+                                        FrameLayout preview = findViewById(R.id.camera);
+                                        preview.addView(mPreview);
+                                    }
+
                                 } catch (FileNotFoundException e) {
                                     Log.d(TAG, "File not found: " + e.getMessage());
                                 } catch (IOException e) {
@@ -185,7 +201,6 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
         }
         return c; // returns null if camera is unavailable
     }
-
 
 
     /**
@@ -386,9 +401,9 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
     private double getDirection(double lat1, double lng1, double lat2, double lng2) {
 
         double PI = Math.PI;
-        double dTeta = Math.log(Math.tan((lat2/2)+(PI/4))/Math.tan((lat1/2)+(PI/4)));
-        double dLon = Math.abs(lng1-lng2);
-        double teta = Math.atan2(dLon,dTeta);
+        double dTeta = Math.log(Math.tan((lat2 / 2) + (PI / 4)) / Math.tan((lat1 / 2) + (PI / 4)));
+        double dLon = Math.abs(lng1 - lng2);
+        double teta = Math.atan2(dLon, dTeta);
         double direction = Math.round(Math.toDegrees(teta));
         return direction; //direction in degree
 

@@ -1,29 +1,33 @@
 package com.example.minorproject2;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.provider.Settings;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -45,15 +49,29 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import static com.example.minorproject2.CameraActivity.MEDIA_TYPE_IMAGE;
 
 public class SendImageActivity extends AppCompatActivity {
 
     private static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 99;
+    private static String s;
     private GoogleApiClient googleApiClient;
     private Location mLastLocation;
 
@@ -69,67 +87,173 @@ public class SendImageActivity extends AppCompatActivity {
     String soilDetail;
     private int REQUEST_LOCATION = 101;
     private FusedLocationProviderClient fusedLocationClient;
-
+    DatabaseReference latReference, longReference, areaReference;
+    ArrayList<String> images;
+    private ProgressDialog progressDialog;
+    private StorageReference mStorageRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_image);
         user = FirebaseAuth.getInstance().getCurrentUser();
+        latReference = FirebaseDatabase.getInstance().getReference("uploadedLat");
+        longReference = FirebaseDatabase.getInstance().getReference("uploadedLon");
+        areaReference = FirebaseDatabase.getInstance().getReference("uploadedArea");
+
+        areaReference.setValue("200");
+
         if (user == null) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
         }
         setViewById();
+        mStorageRef = FirebaseStorage.getInstance().getReference("uploadedFromPython");
 
-        if (checkAndRequestPermissions()) {
-            if (hasGPSDevice(getApplicationContext())) {
-                enableLoc();
-                getLocation();
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Please wait while we are uploading image...");
+        progressDialog.setCancelable(false);
+        if (getIntent().getBooleanExtra("imagesClicked", false))
+        {
+            progressDialog.show();
+            images = new ArrayList<>();
+            images.add(getIntent().getStringExtra("image1"));
+            images.add(getIntent().getStringExtra("image2"));
+            images.add(getIntent().getStringExtra("image3"));
+            images.add(getIntent().getStringExtra("image4"));
+            makeCollage();
+
+        }else{
+            if (checkAndRequestPermissions()) {
+                if (hasGPSDevice(getApplicationContext())) {
+                    enableLoc();
+                    getLocation();
+                }
             }
+
+
+            eastImageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(getApplicationContext(), CameraActivity.class).putExtra("requirement", "east"));
+                    finish();
+                }
+            });
+
+        }
+
+
+    }
+    private static File getOutputMediaFile(int type) {
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "minor");
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Log.d("MyCameraApp", "failed to create directory");
+                return null;
+            }
+        }
+
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File mediaFile;
+        if (type == MEDIA_TYPE_IMAGE) {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                    "IMG_" + timeStamp + ".png");
+            s =  "IMG_" + timeStamp + ".png";
+        } else {
+            return null;
+        }
+
+        return mediaFile;
+    }
+
+    private void makeCollage() {
+        Bitmap[] parts = new Bitmap[4];
+
+        for (int i=0;i<images.size();i++)
+        {
+            File imgFile = new File(images.get(i));
+            if(imgFile.exists()){
+                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                parts[i] = myBitmap;
+
+            }
+        }
+        Bitmap result = Bitmap.createBitmap(parts[0].getWidth() * 2, parts[0].getHeight() * 2, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(result);
+        Paint paint = new Paint();
+        for (int i = 0; i < parts.length; i++) {
+            canvas.drawBitmap(parts[i], parts[i].getWidth() * (i % 2), parts[i].getHeight() * (i / 2), paint);
+        }
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        result.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        //Uri file = Uri.fromFile(new File(result+".png"));
+        final File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
+        if (pictureFile == null) {
+            Log.d(TAG, "Error creating media file, check storage permissions");
+            return;
         }
 
         try {
-            Uri uri = Uri.parse(getIntent().getStringExtra("path"));
-            Glide.with(getApplicationContext()).asBitmap().load(uri).addListener(new RequestListener<Bitmap>() {
-                @Override
-                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                    Log.d(TAG, "onLoadFailed: " + e);
-                    return false;
-                }
+            FileOutputStream fos = new FileOutputStream(pictureFile);
+            fos.write(byteArray);
+            fos.close();
+            //Toast.makeText(CameraActivity.this, "" + pictureFile, Toast.LENGTH_SHORT).show();
+            final StorageReference riversRef = mStorageRef.child(s);
+            Uri.fromFile(new File(pictureFile.getAbsolutePath()));
+            progressDialog.dismiss();
 
+            analyseImageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
-                    eastImage.setImageBitmap(resource);
-                    Log.d(TAG, "onResourceReady: " + resource);
-                    return false;
+                public void onClick(View v) {
+                    progressDialog.show();
+
+                    riversRef.putFile((Uri.fromFile(new File(pictureFile.getAbsolutePath()))))
+                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    // Get a URL to the uploaded content
+                                    progressDialog.dismiss();
+
+                                    FirebaseDatabase.getInstance().getReference("uploadedFromPython").child(s.substring(0, s.indexOf("."))).setValue(s);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Handle unsuccessful uploads
+                                    // ...
+                                    progressDialog.dismiss();
+
+                                    Log.d(TAG, "onFailure: "+exception.getCause());
+                                    Toast.makeText(SendImageActivity.this, ""+exception, Toast.LENGTH_SHORT).show();
+                                }
+                            });
                 }
-            }).submit();
-            //eastImage.setImageURI(uri);
-            Log.d(TAG, "onNewIntent: " + uri);
-            eastImage.setVisibility(View.VISIBLE);
-        } catch (Exception e) {
-            Log.d(TAG, "onNewIntent: " + e);
+            });
+
+
+
+
+        } catch (FileNotFoundException e) {
+            Log.d(TAG, "File not found: " + e.getMessage());
+        } catch (IOException e) {
+            Log.d(TAG, "Error accessing file: " + e.getMessage());
         }
-        eastImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), CameraActivity.class).putExtra("requirement", "east"));
-                finish();
-            }
-        });
-        westImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), CameraActivity.class).putExtra("requirement", "west"));
-            }
-        });
 
-        analyseImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(SendImageActivity.this, "ANALYZE", Toast.LENGTH_SHORT).show();
-            }
-        });
+    }
+
+    private Bitmap getYourInputImage() {
+
+        return BitmapFactory.decodeResource(getResources(), R.drawable.rooftop);
 
     }
 
@@ -268,6 +392,9 @@ public class SendImageActivity extends AppCompatActivity {
                                         if (addresses.size() > 0) {
                                             Log.d(TAG, "onSuccess: "+addresses.get(0).getPostalCode());
                                         }
+                                        latReference.setValue(location.getLatitude()+"");
+                                        longReference.setValue(location.getLongitude()+"");
+
 
                                     } catch (IOException e) {
                                         e.printStackTrace();
