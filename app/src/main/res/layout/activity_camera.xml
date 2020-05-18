@@ -69,6 +69,13 @@
         android:layout_height="wrap_content"
         android:textSize="32sp"
         android:text="Image 1"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimaryDark"
         android:layout_centerInParent="true"
         android:id="@+id/imageCount"/>
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:background="@color/black_overlay"/>
 </RelativeLayout>

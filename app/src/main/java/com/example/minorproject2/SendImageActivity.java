@@ -19,6 +19,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -49,8 +50,12 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -65,6 +70,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import static com.example.minorproject2.CameraActivity.MEDIA_TYPE_IMAGE;
 
@@ -75,8 +81,8 @@ public class SendImageActivity extends AppCompatActivity {
     private GoogleApiClient googleApiClient;
     private Location mLastLocation;
 
-    Button eastImageButton, westImageButton, analyseImageButton;
-
+    Button eastImageButton, westImageButton, analyseImageButton, getDetailsButton;
+    EditText et_rooftop;
     ImageView eastImage, westImage;
 
     FirebaseUser user;
@@ -84,13 +90,13 @@ public class SendImageActivity extends AppCompatActivity {
     private String TAG = "tag";
     private Button soilDetailButton;
 
-    String soilDetail;
     private int REQUEST_LOCATION = 101;
     private FusedLocationProviderClient fusedLocationClient;
-    DatabaseReference latReference, longReference, areaReference;
+    DatabaseReference latReference, longReference, areaReference, postalReference;
     ArrayList<String> images;
     private ProgressDialog progressDialog;
     private StorageReference mStorageRef;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,8 +105,8 @@ public class SendImageActivity extends AppCompatActivity {
         latReference = FirebaseDatabase.getInstance().getReference("uploadedLat");
         longReference = FirebaseDatabase.getInstance().getReference("uploadedLon");
         areaReference = FirebaseDatabase.getInstance().getReference("uploadedArea");
+        postalReference = FirebaseDatabase.getInstance().getReference("uploadedPostalCode");
 
-        areaReference.setValue("200");
 
         if (user == null) {
             startActivity(new Intent(this, LoginActivity.class));
@@ -112,17 +118,22 @@ public class SendImageActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Please wait while we are uploading image...");
         progressDialog.setCancelable(false);
-        if (getIntent().getBooleanExtra("imagesClicked", false))
-        {
-            progressDialog.show();
+        if (getIntent().getBooleanExtra("imagesClicked", false)) {
+            //progressDialog.show();
+            eastImageButton.setVisibility(View.GONE);
             images = new ArrayList<>();
             images.add(getIntent().getStringExtra("image1"));
             images.add(getIntent().getStringExtra("image2"));
             images.add(getIntent().getStringExtra("image3"));
             images.add(getIntent().getStringExtra("image4"));
-            makeCollage();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    makeCollage();
+                }
+            });
 
-        }else{
+        } else {
             if (checkAndRequestPermissions()) {
                 if (hasGPSDevice(getApplicationContext())) {
                     enableLoc();
@@ -143,6 +154,7 @@ public class SendImageActivity extends AppCompatActivity {
 
 
     }
+
     private static File getOutputMediaFile(int type) {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
@@ -165,7 +177,7 @@ public class SendImageActivity extends AppCompatActivity {
         if (type == MEDIA_TYPE_IMAGE) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "IMG_" + timeStamp + ".png");
-            s =  "IMG_" + timeStamp + ".png";
+            s = "IMG_" + timeStamp + ".png";
         } else {
             return null;
         }
@@ -176,10 +188,9 @@ public class SendImageActivity extends AppCompatActivity {
     private void makeCollage() {
         Bitmap[] parts = new Bitmap[4];
 
-        for (int i=0;i<images.size();i++)
-        {
+        for (int i = 0; i < images.size(); i++) {
             File imgFile = new File(images.get(i));
-            if(imgFile.exists()){
+            if (imgFile.exists()) {
                 Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                 parts[i] = myBitmap;
 
@@ -208,39 +219,72 @@ public class SendImageActivity extends AppCompatActivity {
             fos.close();
             //Toast.makeText(CameraActivity.this, "" + pictureFile, Toast.LENGTH_SHORT).show();
             final StorageReference riversRef = mStorageRef.child(s);
-            Uri.fromFile(new File(pictureFile.getAbsolutePath()));
+            Glide.with(getApplicationContext()).load(Uri.fromFile(new File(pictureFile.getAbsolutePath()))).into(eastImage);
+
             progressDialog.dismiss();
 
             analyseImageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    progressDialog.show();
 
-                    riversRef.putFile((Uri.fromFile(new File(pictureFile.getAbsolutePath()))))
-                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    // Get a URL to the uploaded content
-                                    progressDialog.dismiss();
+                    if (et_rooftop.getText().toString().length() < 1) {
+                        Toast.makeText(SendImageActivity.this, "Enter rooftop area", Toast.LENGTH_SHORT).show();
+                    } else {
+                        progressDialog.show();
 
-                                    FirebaseDatabase.getInstance().getReference("uploadedFromPython").child(s.substring(0, s.indexOf("."))).setValue(s);
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
-                                    // Handle unsuccessful uploads
-                                    // ...
-                                    progressDialog.dismiss();
+                        areaReference.setValue(et_rooftop.getText().toString());
+                        et_rooftop.setFocusable(false);
+                        riversRef.putFile((Uri.fromFile(new File(pictureFile.getAbsolutePath()))))
+                                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        // Get a URL to the uploaded content
+                                        progressDialog.dismiss();
 
-                                    Log.d(TAG, "onFailure: "+exception.getCause());
-                                    Toast.makeText(SendImageActivity.this, ""+exception, Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                                        progressDialog.setMessage("Please wait...");
+                                        FirebaseDatabase.getInstance().getReference("uploadedFromPython").child(s.substring(0, s.indexOf("."))).setValue(s);
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception exception) {
+                                        // Handle unsuccessful uploads
+                                        // ...
+                                        progressDialog.dismiss();
+
+                                        Log.d(TAG, "onFailure: " + exception.getCause());
+                                        Toast.makeText(SendImageActivity.this, "" + exception, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
+
                 }
             });
 
 
+            getDetailsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    progressDialog.show();
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+                    Query lastQuery = databaseReference.child("result").orderByKey().limitToLast(1);
+                    lastQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot data) {
+                            progressDialog.dismiss();
+                            String result = String.valueOf(Objects.requireNonNull(data.getValue()).toString());
+                            result = result.substring(result.indexOf("=") + 1);
+                            result = result.substring(0, result.indexOf("}"));
+                            Toast.makeText(SendImageActivity.this, "" + result, Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            progressDialog.dismiss();
+                        }
+                    });
+                }
+            });
 
 
         } catch (FileNotFoundException e) {
@@ -257,12 +301,6 @@ public class SendImageActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-
-
-    }
 
     private void setViewById() {
         eastImage = findViewById(R.id.imageEast);
@@ -270,7 +308,8 @@ public class SendImageActivity extends AppCompatActivity {
         eastImageButton = findViewById(R.id.imageEastButton);
         westImageButton = findViewById(R.id.imageWestButton);
         analyseImageButton = findViewById(R.id.submitImageButton);
-        soilDetailButton = findViewById(R.id.soilDetails);
+        getDetailsButton = findViewById(R.id.soilDetails);
+        et_rooftop = findViewById(R.id.et_rooftop);
     }
 
     private boolean checkAndRequestPermissions() {
@@ -390,10 +429,11 @@ public class SendImageActivity extends AppCompatActivity {
                                     try {
                                         addresses = gcd.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
                                         if (addresses.size() > 0) {
-                                            Log.d(TAG, "onSuccess: "+addresses.get(0).getPostalCode());
+                                            Log.d(TAG, "onSuccess: " + addresses.get(0).getPostalCode());
+                                            latReference.setValue(location.getLatitude() + "");
+                                            longReference.setValue(location.getLongitude() + "");
+                                            postalReference.setValue(addresses.get(0).getPostalCode());
                                         }
-                                        latReference.setValue(location.getLatitude()+"");
-                                        longReference.setValue(location.getLongitude()+"");
 
 
                                     } catch (IOException e) {

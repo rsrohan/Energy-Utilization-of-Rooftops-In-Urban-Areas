@@ -1,69 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:layout_gravity="center"
-    android:gravity="center"
     android:background="#283040"
+    android:gravity="center"
+    android:orientation="vertical"
     tools:context=".SendImageActivity">
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
         android:id="@+id/imageEast"
-        android:scaleType="centerCrop"
-        android:visibility="gone"
-        />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageEastButton"
-        android:padding="4dp"
-        android:layout_margin="4dp"
-        android:textColor="@android:color/white"
-        android:background="@drawable/ic_write_text"
-        android:text="Tap to input images for all directions"
-        />
-    <ImageView
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:id="@+id/imageWest"
-        android:visibility="gone"
-        />
+        android:scaleType="centerCrop" />
+
     <Button
+        android:id="@+id/imageEastButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/imageWestButton"
-        android:padding="4dp"
-        android:layout_margin="4dp"
-        android:visibility="gone"
-        android:textColor="@android:color/white"
+        android:layout_margin="8dp"
         android:background="@drawable/ic_write_text"
-        android:text="@string/tap_to_input_west_facing_image"
+        android:paddingHorizontal="24dp"
+        android:text="Tap to input images for all directions"
+        android:textColor="@android:color/white" />
+
+    <EditText
+        android:id="@+id/et_rooftop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="@drawable/ic_recharge_amount_bg2"
+        android:gravity="center"
+        android:hint="Rooftop Area in (sq meter)"
+        android:inputType="number"
+        android:textColor="@color/colorPrimaryDark"
+        android:textColorHint="@color/colorPrimaryDark" />
+
+    <ImageView
+        android:id="@+id/imageWest"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/imageWestButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
         android:layout_marginBottom="40dp"
-        />
+        android:background="@drawable/ic_write_text"
+        android:padding="4dp"
+        android:text="@string/tap_to_input_west_facing_image"
+        android:textColor="@android:color/white"
+        android:visibility="gone" />
+
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/submitImageButton"
-        android:text="@string/analyseimages"
-        android:padding="4dp"
-        android:textColor="@android:color/white"
-        android:background="@drawable/buttons_colorprimary_bg"
-        android:layout_margin="8dp"
-        />
-    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/soilDetails"
-        android:text="@string/soilDetails"
-        android:padding="4dp"
-        android:textColor="@android:color/white"
-        android:background="@drawable/buttons_colorprimary_bg"
         android:layout_margin="8dp"
-        />
+        android:background="@drawable/buttons_colorprimary_bg"
+        android:padding="4dp"
+        android:text="@string/analyseimages"
+        android:textColor="@android:color/white" />
+
+    <Button
+        android:id="@+id/soilDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="@drawable/buttons_colorprimary_bg"
+        android:padding="4dp"
+        android:text="@string/soilDetails"
+        android:textColor="@android:color/white" />
 </LinearLayout>
