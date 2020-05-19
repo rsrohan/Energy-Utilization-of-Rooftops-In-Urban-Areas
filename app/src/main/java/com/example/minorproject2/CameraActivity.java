@@ -61,10 +61,10 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
     LocationManager locationManager;
     TextView imageCount;
     float currentDegree = 0f;
-    private double longitude = 0, latitude = 0, prevLatitude = 0, prevLongitude = 0;
     int count = 1;
     public static ArrayList<String> images = null;
-    boolean firstTimeLocationTrack = true;
+    private FrameLayout preview;
+    int imagesToBeTaken;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -81,6 +81,7 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
         imageCount = findViewById(R.id.imageCount);
 
 
+        imagesToBeTaken = getIntent().getIntExtra("requirement", 4);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
@@ -92,7 +93,7 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
 
                 // Create our Preview view and set it as the content of our activity.
                 mPreview = new CameraPreview(this, mCamera);
-                FrameLayout preview = findViewById(R.id.camera);
+                preview = findViewById(R.id.camera);
                 preview.addView(mPreview);
 
                 capture.setOnClickListener(new View.OnClickListener() {
@@ -116,21 +117,28 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
                                     progressBar.setVisibility(View.GONE);
                                     images.add(pictureFile.toString());
                                     count++;
-                                    if (images.size() == 4) {
-                                        startActivity(new Intent(getApplicationContext(), SendImageActivity.class)
-                                                .putExtra("imagesClicked", true)
+                                    if (images.size() == imagesToBeTaken) {
+                                        if (imagesToBeTaken==3)
+                                        { startActivity(new Intent(getApplicationContext(), InputRooftopAreaActivity.class)
+                                                .putExtra("imagesClicked", 3)
                                                 .putExtra("image1", images.get(0))
                                                 .putExtra("image2", images.get(1))
-                                                .putExtra("image3", images.get(2))
-                                                .putExtra("image4", images.get(3)));
+                                                .putExtra("image3", images.get(2)));
+                                        }else{
+                                            startActivity(new Intent(getApplicationContext(), InputRooftopAreaActivity.class)
+                                                    .putExtra("imagesClicked", 4)
+                                                    .putExtra("image1", images.get(0))
+                                                    .putExtra("image2", images.get(1))
+                                                    .putExtra("image3", images.get(2))
+                                                    .putExtra("image4", images.get(3)));
+                                        }
+
                                         finish();
                                     } else {
                                         imageCount.setText("Image " + count);
                                         mCamera = getCameraInstance();
-
-                                        // Create our Preview view and set it as the content of our activity.
                                         mPreview = new CameraPreview(getApplicationContext(), mCamera);
-                                        FrameLayout preview = findViewById(R.id.camera);
+                                        //preview = findViewById(R.id.camera);
                                         preview.addView(mPreview);
                                     }
 
@@ -189,9 +197,7 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
         return true;
     }
 
-    /**
-     * A safe way to get an instance of the Camera object.
-     */
+
     public static Camera getCameraInstance() {
         Camera c = null;
         try {
@@ -203,9 +209,6 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
     }
 
 
-    /**
-     * A basic Camera preview class
-     */
     public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
         private SurfaceHolder mHolder;
         private Camera mCamera;
@@ -215,11 +218,9 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
             super(context);
             mCamera = camera;
 
-            // Install a SurfaceHolder.Callback so we get notified when the
-            // underlying surface is created and destroyed.
+
             mHolder = getHolder();
             mHolder.addCallback(this);
-            // deprecated setting, but required on Android versions prior to 3.0
             mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         }
 
@@ -234,29 +235,20 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
         }
 
         public void surfaceDestroyed(SurfaceHolder holder) {
-            // empty. Take care of releasing the Camera preview in your activity.
         }
 
         public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-            // If your preview can change or rotate, take care of those events here.
-            // Make sure to stop the preview before resizing or reformatting it.
 
             if (mHolder.getSurface() == null) {
-                // preview surface does not exist
                 return;
             }
 
-            // stop preview before making changes
             try {
                 mCamera.stopPreview();
             } catch (Exception e) {
-                // ignore: tried to stop a non-existent preview
             }
 
-            // set preview size and make any resize, rotate or
-            // reformatting changes here
 
-            // start preview with new settings
             try {
                 mCamera.setPreviewDisplay(mHolder);
                 mCamera.setDisplayOrientation(90);
@@ -285,15 +277,11 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
      * Create a File for saving an image or video
      */
     private static File getOutputMediaFile(int type) {
-        // To be safe, you should check that the SDCard is mounted
-        // using Environment.getExternalStorageState() before doing this.
+
 
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES), "MyCameraApp");
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
 
-        // Create the storage directory if it does not exist
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
                 Log.d("MyCameraApp", "failed to create directory");
@@ -301,7 +289,6 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
             }
         }
 
-        // Create a media file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
         if (type == MEDIA_TYPE_IMAGE) {
@@ -318,12 +305,9 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-        // get the angle around the z-axis rotated
         float degree = Math.round(event.values[0]);
 
-        //Toast.makeText(this, "Heading: " + Float.toString(degree) + " degrees", Toast.LENGTH_SHORT).show();
 
-        // create a rotation animation (reverse turn degree degrees)
         RotateAnimation ra = new RotateAnimation(
                 currentDegree,
                 -degree,
