@@ -98,10 +98,7 @@ public class SendImageActivity extends AppCompatActivity {
         postalReference = FirebaseDatabase.getInstance().getReference("uploadedPostalCode");
 
 
-        if (user == null) {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-        }
+
         setViewById();
 
 

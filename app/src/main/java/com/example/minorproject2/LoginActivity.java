@@ -49,12 +49,12 @@ public class LoginActivity extends AppCompatActivity {
                                 profileDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                                     @Override
                                     public void onDismiss(DialogInterface dialog) {
-                                        startActivity(new Intent(getApplicationContext(), SendImageActivity.class));
+                                        startActivity(new Intent(getApplicationContext(), SplashActivity.class));
                                         finish();
                                     }
                                 });
                             }else{
-                                startActivity(new Intent(getApplicationContext(), SendImageActivity.class));
+                                startActivity(new Intent(getApplicationContext(), SplashActivity.class));
                                 finish();
                             }
                         }

@@ -83,7 +83,7 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
         areaReference = FirebaseDatabase.getInstance().getReference("uploadedArea");
 
         progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Uploading image...");
+        progressDialog.setMessage("Uploading Image...");
         progressDialog.setCancelable(false);
         imagesCount = getIntent().getIntExtra("imagesClicked", 4);
         if (imagesCount == 3) {

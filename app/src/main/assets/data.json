@@ -1,0 +1,304 @@
+﻿{
+  "data": [
+    {
+      "plants": "Tomato",
+      "soil": "Loam and Sandy Loam",
+      "min temp": "18",
+      "max temp": "24",
+      "energy/ sq. m in Joules": "409680",
+      "weather": "Warm / Summer",
+      "months": "Mar - Jun",
+      "image": "https://www.growjoy.com/store/pc/catalog/manalucie_tomato_plant_1465_detail.jpg"
+    },
+    {
+      "plants": "Spinach",
+      "soil": "Loam",
+      "min temp": "10",
+      "max temp": "22",
+      "energy/ sq. m in Joules": "417600",
+      "weather": "All",
+      "months": "Sep - Jun",
+      "image": "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/981/articles/2018/02/growingspinach-1000-0-1519138802.jpg"
+    },
+    {
+      "plants": "Radish",
+      "soil": "Fertile Drained Sandy",
+      "min temp": "10",
+      "max temp": "30",
+      "energy/ sq. m in Joules": "360000",
+      "weather": "Winter / Spring",
+      "months": "Mar - Oct",
+      "image": "https://189662-567937-2-raikfcquaxqncofqfm.stackpathdns.com/wp-content/uploads/2015/03/Growing-Radish..jpg"
+    },
+    {
+      "plants": "Cucumber",
+      "soil": "Loam and Sandy Loam",
+      "min temp": "18",
+      "max temp": "24",
+      "energy/ sq. m in Joules": "374400",
+      "weather": "Early Summer",
+      "months": "Mar - Aug",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/ARS_cucumber.jpg/1200px-ARS_cucumber.jpg"
+    },
+    {
+      "plants": "Sweet Potato",
+      "soil": "Loam and Sandy Loam",
+      "min temp": "20",
+      "max temp": "35",
+      "energy/ sq. m in Joules": "385200",
+      "weather": "All",
+      "months": "Jun - Sep",
+      "image": "https://cdn.freshplaza.com/2018/0315/SPotato_Pritchards1.jpg"
+    },
+    {
+      "plants": "Curry Leaves",
+      "soil": "Well Drained Sandy",
+      "min temp": "20",
+      "max temp": "35",
+      "energy/ sq. m in Joules": "421200",
+      "weather": "Summer",
+      "months": "Mar - Aug",
+      "image": "https://images-na.ssl-images-amazon.com/images/I/51VcN7cpH6L.jpg"
+    },
+    {
+      "plants": "Lemon ( Dwarf )",
+      "soil": "Loam and Sandy Loam",
+      "min temp": "10",
+      "max temp": "40",
+      "energy/ sq. m in Joules": "405360",
+      "weather": "All",
+      "months": "Jul - Dec",
+      "image": "https://images-na.ssl-images-amazon.com/images/I/81muc-lHi0L._SL1500_.jpg"
+    },
+    {
+      "plants": "Brinjal",
+      "soil": "Silt Loam",
+      "min temp": "13",
+      "max temp": "21",
+      "energy/ sq. m in Joules": "403200",
+      "weather": "All",
+      "months": "Jul - Jun",
+      "image": "https://189662-567937-2-raikfcquaxqncofqfm.stackpathdns.com/wp-content/uploads/2015/03/Growing-Brinjal-Egg-Plant..jpg"
+    },
+    {
+      "plants": "Coriander",
+      "soil": "Silt Loam",
+      "min temp": "20",
+      "max temp": "25",
+      "energy/ sq. m in Joules": "406800",
+      "weather": "Late Spring and Autumn",
+      "months": "Mar - Sep",
+      "image": "https://gardenerspath.com/wp-content/uploads/2018/06/Grow-the-Best-Cilantro-at-Home-with-These-Tips.jpg"
+    },
+    {
+      "plants": "Mint",
+      "soil": "Moist and Well Drained",
+      "min temp": "13",
+      "max temp": "21",
+      "energy/ sq. m in Joules": "374400",
+      "weather": "All",
+      "months": "Mar - Jun",
+      "image": "https://www.growforagecookferment.com/wp-content/uploads/2020/02/growing-mint.jpg"
+    },
+    {
+      "plants": "Betel Leaves",
+      "soil": "Sandy - Loamy and Lightly Damp",
+      "min temp": "15",
+      "max temp": "40",
+      "energy/ sq. m in Joules": "424800",
+      "weather": "Late Monsoon",
+      "months": "Oct - Feb",
+      "image": "https://images-na.ssl-images-amazon.com/images/I/51WlLvP7iEL.jpg"
+    },
+    {
+      "plants": "Cabbage",
+      "soil": "Sandy - Loam",
+      "min temp": "16",
+      "max temp": "27",
+      "energy/ sq. m in Joules": "349200",
+      "weather": "Winter / Spring",
+      "months": "Oct - Feb",
+      "image": "https://gardenerspath.com/wp-content/uploads/2019/09/Heads-of-cabbage-Brassica-oleracea-var.-capitata.jpg"
+    },
+    {
+      "plants": "Carrot",
+      "soil": "Loose Sandy - Loamy",
+      "min temp": "15",
+      "max temp": "22",
+      "energy/ sq. m in Joules": "378000",
+      "weather": "Late Spring / Winter",
+      "months": "Sep - Feb",
+      "image": "https://morningchores.com/wp-content/uploads/2016/08/Growing-Carrots-The-Beginners-Guide-to-Raising-an-Amazing-Crop-of-Carrots-FI.jpg"
+    },
+    {
+      "plants": "Hibiscus",
+      "soil": "Loam and Sandy Loam",
+      "min temp": "13",
+      "max temp": "22",
+      "energy/ sq. m in Joules": "160560",
+      "weather": "All",
+      "months": "May - Aug",
+      "image": "https://nurserylive.com/images/stories/virtuemart/product/nurserylive-hibiscus-hybrid-any-color-plant.jpg"
+    },
+    {
+      "plants": "Jasmine",
+      "soil": "Loamy",
+      "min temp": "15",
+      "max temp": "24",
+      "energy/ sq. m in Joules": "208800",
+      "weather": "Summer / Early Monsoon",
+      "months": "Jul - Aug",
+      "image": "https://nurserylive.com/images/stories/virtuemart/category/nurserylive-category-jasmine-plant.jpg"
+    },
+    {
+      "plants": "Okra",
+      "soil": "Fertile Sandy - Loam",
+      "min temp": "18",
+      "max temp": "30",
+      "energy/ sq. m in Joules": "390240",
+      "weather": "Warm / Summer",
+      "months": "Feb - Aug",
+      "image": "https://www.banglabazaar.in/wp-content/uploads/2018/12/1-32.jpg"
+    },
+    {
+      "plants": "Beans",
+      "soil": "Sandy and Silty Loam",
+      "min temp": "22",
+      "max temp": "30",
+      "energy/ sq. m in Joules": "412560",
+      "weather": "Spring / Mid Summer",
+      "months": "Mar - Jul",
+      "image": "https://www.saga.co.uk/contentlibrary/saga/publishing/verticals/home-and-garden/gardening/fruit-and-veg/vegetables/bean_stanley_1280.jpg"
+    },
+    {
+      "plants": "Beetroot",
+      "soil": "Loose Loamy",
+      "min temp": "10",
+      "max temp": "30",
+      "energy/ sq. m in Joules": "370800",
+      "weather": "Spring / Summer",
+      "months": "Jun - Oct",
+      "image": "https://www.rimolgreenhouses.com/sites/default/files/images/blog/Beet_root_vegetable.jpg"
+    },
+    {
+      "plants": "Chilli",
+      "soil": "Sandy - Loamy or Heavy Clay",
+      "min temp": "18",
+      "max temp": "25",
+      "energy/ sq. m in Joules": "419040",
+      "weather": "Summer",
+      "months": "May - Oct",
+      "image": "https://indiagardening.com/wp-content/uploads/2020/01/1Green-Chillis-1.jpg"
+    },
+    {
+      "plants": "Turnip",
+      "soil": "Sandy - Loam with Silt and Clay",
+      "min temp": "5",
+      "max temp": "24",
+      "energy/ sq. m in Joules": "372960",
+      "weather": "Winter",
+      "months": "Oct - Mar",
+      "image": "https://i.ytimg.com/vi/vKzs65CPM98/hqdefault.jpg"
+    },
+    {
+      "plants": "Cauliflower",
+      "soil": "Fertile Well - Drained Moist",
+      "min temp": "15",
+      "max temp": "20",
+      "energy/ sq. m in Joules": "375120",
+      "weather": "Winter / Spring",
+      "months": "Sep - Apr",
+      "image": "https://d3qz1qhhp9wxfa.cloudfront.net/growingproduce/wp-content/uploads/2019/03/Aquarius-cauliflower-from-Harris-Seeds-and-Rispens-Seeds.jpg"
+    },
+    {
+      "plants": "Peas",
+      "soil": "Sandy - Loam",
+      "min temp": "13",
+      "max temp": "25",
+      "energy/ sq. m in Joules": "383040",
+      "weather": "Winter",
+      "months": "Dec - Apr",
+      "image": "https://www.bakhabarkissan.com/wp-content/uploads/2019/04/26419C.jpg"
+    },
+    {
+      "plants": "Bougainvillea",
+      "soil": "Feltile Well - Drained Sandy",
+      "min temp": "5",
+      "max temp": "15",
+      "energy/ sq. m in Joules": "209880",
+      "weather": "All",
+      "months": "May - Dec",
+      "image": "https://5.imimg.com/data5/PN/WK/MY-62202243/bougainvillea-plants-500x500.jpg"
+    },
+    {
+      "plants": "Gardenias",
+      "soil": "Well Drained Fertile",
+      "min temp": "15",
+      "max temp": "22",
+      "energy/ sq. m in Joules": "209880",
+      "weather": "Warm / Summer",
+      "months": "Apr - Jun",
+      "image": "https://southernlivingplants.com/wp-content/uploads/How_To_Maximize_Gardenia_Blooms_1200x630.jpg"
+    },
+    {
+      "plants": "Tuberose",
+      "soil": "Loamy - Sandy",
+      "min temp": "18",
+      "max temp": "32",
+      "energy/ sq. m in Joules": "183600",
+      "weather": "All",
+      "months": "Apr - Mar",
+      "image": "https://i.pinimg.com/originals/14/60/4d/14604d3c183734ddcde1135910e534cc.jpg"
+    },
+    {
+      "plants": "Rose",
+      "soil": "Medium to Heavy Loam",
+      "min temp": "15",
+      "max temp": "28",
+      "energy/ sq. m in Joules": "187200",
+      "weather": "Spring / Summer / Autumn",
+      "months": "Feb - Oct",
+      "image": "https://www.plantsguru.com/image/cache/plant-packs/rose-pack-800x800.png"
+    },
+    {
+      "plants": "Allamanda",
+      "soil": "Potting Soil",
+      "min temp": "5",
+      "max temp": "15",
+      "energy/ sq. m in Joules": "207000",
+      "weather": "Summer and Monsoon",
+      "months": "Mar - Sep",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/5/51/Hoa_Thang_Giu.jpg"
+    },
+    {
+      "plants": "Marigold",
+      "soil": "Sandy - Loam",
+      "min temp": "18",
+      "max temp": "35",
+      "energy/ sq. m in Joules": "201600",
+      "weather": "Winter / Summer",
+      "months": "Sep - Feb",
+      "image": "https://naturerabbit.in/wp-content/uploads/2018/08/Nature-Rabbit-African-marigold-Orange-Plant.jpg"
+    },
+    {
+      "plants": "Plumerias",
+      "soil": "Well - Drained Loamy",
+      "min temp": "13",
+      "max temp": "24",
+      "energy/ sq. m in Joules": "211320",
+      "weather": "Summer",
+      "months": "Apr - Sep",
+      "image": "https://www.gardeningknowhow.com/wp-content/uploads/2011/04/plumeria1.jpg"
+    },
+    {
+      "plants": "Rangoon Creeper",
+      "soil": "Well - Drained Loamy",
+      "min temp": "4",
+      "max temp": "22",
+      "energy/ sq. m in Joules": "201600",
+      "weather": "Warm / Summer",
+      "months": "Apr - Aug",
+      "image": "https://www.lilplants.com/wp-content/uploads/2017/08/Madhumalti-Dwarf-Rangoon-Creeper-Plant-1.jpg"
+    }
+  ]
+}

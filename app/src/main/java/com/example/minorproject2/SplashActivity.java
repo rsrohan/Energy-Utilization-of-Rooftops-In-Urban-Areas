@@ -19,6 +19,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class SplashActivity extends AppCompatActivity {
 
     private ViewPager viewPager;
@@ -27,6 +30,7 @@ public class SplashActivity extends AppCompatActivity {
     private TextView[] dots;
     private int[] layouts;
     private Button btnNext;
+    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +39,12 @@ public class SplashActivity extends AppCompatActivity {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         }
         setContentView(R.layout.activity_splash);
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
+        if (user == null) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+        }
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         dotsLayout = (LinearLayout) findViewById(R.id.layoutDots);
         btnNext = (Button) findViewById(R.id.btn_next);

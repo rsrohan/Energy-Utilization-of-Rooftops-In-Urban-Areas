@@ -11,7 +11,7 @@
     <string name="tap_to_input_west_facing_image">tap to input west facing image</string>
     <string name="tap_to_input_east_facing_image">Tap to input east facing image</string>
     <string name="analyseimages">analyse my rooftop</string>
-    <string name="yourphone">Enter 10 digit phone no.</string>
+    <string name="yourphone">Phone Number (10 Digits)</string>
     <string name="send_otp">send OTP</string>
     <string name="verify">verify</string>
     <string name="resend_otp">resend otp</string>
