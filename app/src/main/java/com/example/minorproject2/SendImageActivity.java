@@ -137,19 +137,26 @@ public class SendImageActivity extends AppCompatActivity {
                     lastQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot data) {
-                            progressDialog.dismiss();
-                            String result = String.valueOf(Objects.requireNonNull(data.getValue()).toString());
-                            Log.d(TAG, "onDataChange: "+result);
-                            result = result.substring(result.indexOf("=") + 1);
-                            result = result.substring(0, result.indexOf("}"));
-                            Log.d(TAG, "onDataChange: " + result);
-                            if (result.equals("NULL")) {
-                                Toast.makeText(SendImageActivity.this, "Sorry no plants found in our database.", Toast.LENGTH_SHORT).show();
-                            } else {
-                                startActivity(new Intent(getApplicationContext(), ResultActivity.class).putExtra("result", result));
-                                finish();
+                            if (data.getValue()!=null)
+                            {
+                                progressDialog.dismiss();
+                                String result = String.valueOf(Objects.requireNonNull(data.getValue()).toString());
+                                Log.d(TAG, "onDataChange: "+result);
+                                result = result.substring(result.indexOf("=") + 1);
+                                result = result.substring(0, result.indexOf("}"));
+                                Log.d(TAG, "onDataChange: " + result);
+                                if (result.equals("NULL")) {
+                                    Toast.makeText(SendImageActivity.this, "Sorry no plants found in our database.", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    startActivity(new Intent(getApplicationContext(), ResultActivity.class).putExtra("result", result));
+                                    finish();
+                                }
+                                //Toast.makeText(InputRooftopAreaActivity.this, "" + result, Toast.LENGTH_SHORT).show();
+
+                            }else{
+                                progressDialog.dismiss();
+                                Toast.makeText(SendImageActivity.this, "Ruko Zara ! Sabr Karo...", Toast.LENGTH_SHORT).show();
                             }
-                            //Toast.makeText(InputRooftopAreaActivity.this, "" + result, Toast.LENGTH_SHORT).show();
 
                         }
 
