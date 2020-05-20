@@ -9,6 +9,49 @@
     android:background="@color/colorAccent"
     tools:context=".ResultActivity">
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:id="@+id/ll"
+        android:visibility="gone"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="200dp"
+            android:layout_margin="12dp"
+            app:cardCornerRadius="12dp"
+            android:layout_height="200dp">
+            <ImageView
+                android:layout_width="200dp"
+                android:scaleType="centerCrop"
+                android:layout_height="200dp"
+                android:src="@drawable/sorry" />
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:text="Sorry no image found in our database\n:("
+            android:textSize="20sp"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:paddingLeft="@dimen/desc_padding"
+            android:paddingRight="@dimen/desc_padding"
+            android:text="Stay tuned! we will be having a lot more plants soon."
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            />
+
+    </LinearLayout>
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:id="@+id/recyclerView"

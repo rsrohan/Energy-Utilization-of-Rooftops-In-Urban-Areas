@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -88,16 +89,18 @@ public class SendImageActivity extends AppCompatActivity {
     ArrayList<String> images;
     private ProgressDialog progressDialog;
 
+    TextView tv_result;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_image);
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
+        progressDialog.setMessage("Please wait...");
         user = FirebaseAuth.getInstance().getCurrentUser();
-        latReference = FirebaseDatabase.getInstance().getReference("uploadedLat");
-        longReference = FirebaseDatabase.getInstance().getReference("uploadedLon");
-        postalReference = FirebaseDatabase.getInstance().getReference("uploadedPostalCode");
-
-
+        latReference = FirebaseDatabase.getInstance().getReference(Objects.requireNonNull(user.getPhoneNumber())).child("uploadedLat");
+        longReference = FirebaseDatabase.getInstance().getReference(user.getPhoneNumber()).child("uploadedLon");
+        postalReference = FirebaseDatabase.getInstance().getReference(user.getPhoneNumber()).child("uploadedPostalCode");
 
         setViewById();
 
@@ -124,6 +127,43 @@ public class SendImageActivity extends AppCompatActivity {
                 finish();
             }
         });
+        tv_result.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try{
+                    progressDialog.show();
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(user.getPhoneNumber());
+                    Query lastQuery = databaseReference.child("result").orderByKey().limitToLast(1);
+                    lastQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot data) {
+                            progressDialog.dismiss();
+                            String result = String.valueOf(Objects.requireNonNull(data.getValue()).toString());
+                            Log.d(TAG, "onDataChange: "+result);
+                            result = result.substring(result.indexOf("=") + 1);
+                            result = result.substring(0, result.indexOf("}"));
+                            Log.d(TAG, "onDataChange: " + result);
+                            if (result.equals("NULL")) {
+                                Toast.makeText(SendImageActivity.this, "Sorry no plants found in our database.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                startActivity(new Intent(getApplicationContext(), ResultActivity.class).putExtra("result", result));
+                                finish();
+                            }
+                            //Toast.makeText(InputRooftopAreaActivity.this, "" + result, Toast.LENGTH_SHORT).show();
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            progressDialog.dismiss();
+                        }
+                    });
+                }catch (Exception e){
+                    progressDialog.show();
+                    Toast.makeText(SendImageActivity.this, "Ruko Zara ! Sabr Karo...", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private Bitmap getYourInputImage() {
@@ -137,7 +177,7 @@ public class SendImageActivity extends AppCompatActivity {
 
         eastImageButton = findViewById(R.id.imageEastButton);
         westImageButton = findViewById(R.id.imageWestButton);
-
+        tv_result = findViewById(R.id.tv_result);
     }
 
     private boolean checkAndRequestPermissions() {

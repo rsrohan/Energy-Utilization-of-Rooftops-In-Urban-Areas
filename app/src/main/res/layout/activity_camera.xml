@@ -60,7 +60,7 @@
 
     <View
         android:layout_width="1dp"
-        android:layout_height="300dp"
+        android:layout_height="200dp"
         android:layout_centerInParent="true"
         android:id="@+id/line1"
         android:background="@color/colorAccent"/>
@@ -95,7 +95,7 @@
         android:layout_toEndOf="@id/line1"
         android:layout_marginStart="20dp"
         android:textColor="@color/colorAccent"
-        android:text="Top side"
+        android:text="Top\nside"
         android:id="@+id/top"
         android:gravity="center"
         android:drawableEnd="@drawable/ic_chevron_right_black_24dp"/>
@@ -106,7 +106,7 @@
         android:layout_marginEnd="20dp"
         android:layout_toStartOf="@id/line1"
         android:textColor="@color/colorAccent"
-        android:text="Bottom side"
+        android:text="Bottom\nside"
         android:gravity="center"
         android:id="@+id/bottom"
         android:drawableStart="@drawable/ic_chevron_left_black_24dp"/>

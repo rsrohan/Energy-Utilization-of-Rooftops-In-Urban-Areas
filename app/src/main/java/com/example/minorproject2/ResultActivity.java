@@ -4,6 +4,7 @@ import android.content.ReceiverCallNotAllowedException;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
@@ -48,10 +49,21 @@ public class ResultActivity extends AppCompatActivity {
         Log.d("TAG", "onCreate: " + month.get(0) + "-" + plants.size());
         ArrayList<String> plantIndex = new ArrayList<>();
         for (int i = 0; i < plants.size(); i++) {
-            String indexes[] = plants.get(i).split("-");
+            if (!plants.get(i).equals(""))
+            {
+                if (plants.get(i).contains("-"))
+                {
+                    String indexes[] = plants.get(i).split("-");
+                    plantIndex.add(month.get(i));
+                    plantIndex.addAll(Arrays.asList(indexes));
+                }else{
+                    plantIndex.add(month.get(i));
+                    plantIndex.add(plants.get(i));
+                }
+            }
+
             //plantIndex.add(null);
-            plantIndex.add(month.get(i));
-            plantIndex.addAll(Arrays.asList(indexes));
+
         }
         try {
             JSONObject jsonObject = new JSONObject(loadJSONFromAsset());
@@ -80,6 +92,10 @@ public class ResultActivity extends AppCompatActivity {
                 }
             }
 
+            if (plantArrayList.size()==0)
+            {
+                findViewById(R.id.ll).setVisibility(View.VISIBLE);
+            }
             RecyclerAdapterForPlants recyclerAdapterForPlants = new RecyclerAdapterForPlants(getApplicationContext(), plantArrayList);
             recyclerView.setAdapter(recyclerAdapterForPlants);
 

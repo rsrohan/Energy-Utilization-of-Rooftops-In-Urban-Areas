@@ -55,7 +55,6 @@ public class RecyclerAdapterForPlants extends RecyclerView.Adapter<RecyclerAdapt
 
         }
 
-
     }
 
    

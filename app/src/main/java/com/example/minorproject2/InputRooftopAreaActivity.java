@@ -24,6 +24,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -50,9 +52,9 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
 
     private static String s;
     private Button analyseImageButton;
-    private Button getDetailsButton;
     private EditText et_rooftop;
     int imagesCount = 0;
+    FirebaseUser user;
 
     DatabaseReference areaReference;
     ArrayList<String> images;
@@ -78,9 +80,10 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
         tv_retake = findViewById(R.id.tv_retake);
         scrollView = findViewById(R.id.scrollView);
 
+        user = FirebaseAuth.getInstance().getCurrentUser();
         images = new ArrayList<>();
-        mStorageRef = FirebaseStorage.getInstance().getReference("uploadedFromPython");
-        areaReference = FirebaseDatabase.getInstance().getReference("uploadedArea");
+        mStorageRef = FirebaseStorage.getInstance().getReference(Objects.requireNonNull(user.getPhoneNumber())).child("uploadedFromPython");
+        areaReference = FirebaseDatabase.getInstance().getReference(user.getPhoneNumber()).child("uploadedArea");
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Uploading Image...");
@@ -120,6 +123,7 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
                 }
             }
         });
+
         tv_retake.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -162,21 +166,29 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
     }
 
     private void uploadImage() {
+        FirebaseDatabase.getInstance().getReference(Objects.requireNonNull(user.getPhoneNumber())).child("uploadedCount").setValue(images.size());
 
         for (int i = 0; i < images.size(); i++) {
-            final int x = i;
+
+            final int x = images.size()-i-1;
+
+            String timeStamp = String.valueOf(System.currentTimeMillis());
+            timeStamp = "IMG_"+timeStamp;
+
             final File imgFile = new File(images.get(i));
             final String extension = images.get(i);
+
             if (imgFile.exists()) {
-                final StorageReference riversRef = mStorageRef.child(x + "" + extension.substring(extension.indexOf(".")));
+                final StorageReference riversRef = mStorageRef.child(timeStamp + "" + extension.substring(extension.indexOf(".")));
                 try {
+                    final String finalTimeStamp = timeStamp;
                     riversRef.putFile((Uri.fromFile(new File(imgFile.getAbsolutePath()))))
                             .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                 @Override
                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                     // Get a URL to the uploaded content
-                                    FirebaseDatabase.getInstance().getReference("uploadedFromPython").child("___" + x).setValue(x + "" + extension.substring(extension.indexOf(".")));
-                                    if (x == imagesCount-1) {
+                                    FirebaseDatabase.getInstance().getReference(Objects.requireNonNull(user.getPhoneNumber())).child("uploadedFromPython").child(finalTimeStamp).setValue(finalTimeStamp + "" + extension.substring(extension.indexOf(".")));
+                                    if (x == imagesCount - 1) {
                                         progressDialog.dismiss();
                                         et_rooftop.setVisibility(View.GONE);
                                         scrollView.setVisibility(View.GONE);
@@ -189,36 +201,40 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
                                             public void onClick(View v) {
                                                 progressDialog.setMessage("Please wait...");
                                                 progressDialog.show();
-                                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-                                                Query lastQuery = databaseReference.child("result").orderByKey().limitToLast(1);
-                                                lastQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(DataSnapshot data) {
-                                                        progressDialog.dismiss();
-                                                        String result = String.valueOf(Objects.requireNonNull(data.getValue()).toString());
-                                                        result = result.substring(result.indexOf("=") + 1);
-                                                        result = result.substring(0, result.indexOf("}"));
-                                                        Log.d(TAG, "onDataChange: "+result);
-                                                        if (result.equals("NULL"))
-                                                        {
-                                                            Toast.makeText(InputRooftopAreaActivity.this, "Sorry no plants found in our database.", Toast.LENGTH_SHORT).show();
-                                                        }else{
-                                                            startActivity(new Intent(getApplicationContext(), ResultActivity.class).putExtra("result", result));
-                                                            finish();
+                                                try{
+                                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(user.getPhoneNumber());
+                                                    Query lastQuery = databaseReference.child("result").orderByKey().limitToLast(1);
+                                                    lastQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(DataSnapshot data) {
+                                                            progressDialog.dismiss();
+                                                            String result = String.valueOf(Objects.requireNonNull(data.getValue()).toString());
+                                                            result = result.substring(result.indexOf("=") + 1);
+                                                            result = result.substring(0, result.indexOf("}"));
+                                                            Log.d(TAG, "onDataChange: " + result);
+                                                            if (result.equals("NULL")) {
+                                                                Toast.makeText(InputRooftopAreaActivity.this, "Sorry no plants found in our database.", Toast.LENGTH_SHORT).show();
+                                                            } else {
+                                                                startActivity(new Intent(getApplicationContext(), ResultActivity.class).putExtra("result", result));
+                                                                finish();
+                                                            }
+                                                            //Toast.makeText(InputRooftopAreaActivity.this, "" + result, Toast.LENGTH_SHORT).show();
+
                                                         }
-                                                        //Toast.makeText(InputRooftopAreaActivity.this, "" + result, Toast.LENGTH_SHORT).show();
 
-                                                    }
+                                                        @Override
+                                                        public void onCancelled(DatabaseError databaseError) {
+                                                            progressDialog.dismiss();
+                                                        }
+                                                    });
+                                                }catch (Exception e){
+                                                    Toast.makeText(InputRooftopAreaActivity.this, "Ruko Zara ! Sabr Karo...", Toast.LENGTH_SHORT).show();
+                                                }
 
-                                                    @Override
-                                                    public void onCancelled(DatabaseError databaseError) {
-                                                        progressDialog.dismiss();
-                                                    }
-                                                });
                                             }
                                         });
 
-                                    }else{
+                                    } else {
                                         progressDialog.setMessage("Uploading Image...");
 
                                     }
@@ -236,9 +252,6 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
                                     Toast.makeText(InputRooftopAreaActivity.this, "" + exception, Toast.LENGTH_SHORT).show();
                                 }
                             });
-
-
-
 
 
                 } catch (Exception e) {
@@ -307,7 +320,7 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
                                         progressDialog.dismiss();
 
                                         progressDialog.setMessage("Please wait...");
-                                        FirebaseDatabase.getInstance().getReference("uploadedFromPython").child(s.substring(0, s.indexOf("."))).setValue(s);
+                                        FirebaseDatabase.getInstance().getReference(Objects.requireNonNull(user.getPhoneNumber())).child("uploadedFromPython").child(s.substring(0, s.indexOf("."))).setValue(s);
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -327,29 +340,6 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
             });
 
 
-            getDetailsButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    progressDialog.show();
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-                    Query lastQuery = databaseReference.child("result").orderByKey().limitToLast(1);
-                    lastQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot data) {
-                            progressDialog.dismiss();
-                            String result = String.valueOf(Objects.requireNonNull(data.getValue()).toString());
-                            result = result.substring(result.indexOf("=") + 1);
-                            result = result.substring(0, result.indexOf("}"));
-                            Toast.makeText(InputRooftopAreaActivity.this, "" + result, Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            progressDialog.dismiss();
-                        }
-                    });
-                }
-            });
 
 
         } catch (FileNotFoundException e) {

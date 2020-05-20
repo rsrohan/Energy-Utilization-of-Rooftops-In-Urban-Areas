@@ -65,7 +65,16 @@
         android:text="Click Images of my balcony"
         android:textColor="@android:color/white"
         android:visibility="visible" />
-
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:text="Previous Result"
+        android:id="@+id/tv_result"
+        android:drawablePadding="12dp"
+        android:drawableStart="@drawable/ic_new_releases_black_24dp"
+        android:gravity="center_vertical"
+        android:layout_margin="12dp"/>
 
 
 

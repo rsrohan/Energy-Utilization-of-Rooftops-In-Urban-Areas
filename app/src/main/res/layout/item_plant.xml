@@ -6,32 +6,34 @@
     android:layout_margin="8dp"
     android:backgroundTint="#283040"
     app:cardCornerRadius="8dp">
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/ll_month"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_margin="4dp"
-        android:background="@drawable/ic_recharge_dialog_bg">
+        android:background="@drawable/ic_recharge_dialog_bg"
+        android:gravity="center">
 
         <TextView
+            android:id="@+id/tv_month"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:id="@+id/tv_month"
-            android:textSize="24sp"
             android:text="Month Name"
-            />
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
 
     </LinearLayout>
+
     <LinearLayout
+        android:id="@+id/ll_plant"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:id="@+id/ll_plant"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="12dp"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/iv_plant"
@@ -117,9 +119,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:paddingHorizontal="12dp"
-            android:layout_marginBottom="12dp"
             android:text="Suitable Month: "
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:visibility="gone" />
     </LinearLayout>
 
 

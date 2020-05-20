@@ -26,25 +26,26 @@
         android:roundIcon="@drawable/rooftop_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ResultActivity"></activity>
-        <activity android:name=".InputRooftopAreaActivity" />
-        <activity android:name=".CamActivity" />
-        <activity android:name=".SplashActivity">
 
-        </activity>
-        <activity android:name=".LoginActivity" />
-        <activity
-            android:name=".SendImageActivity"
-            android:launchMode="singleInstance" />
-        <activity
-            android:name=".CameraActivity"
-            android:screenOrientation="portrait" >
+        <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".LoginActivity" />
+        <activity
+            android:name=".SendImageActivity"
+             />
+        <activity
+            android:name=".CameraActivity"
+            android:screenOrientation="portrait">
+
+        </activity>
+        <activity android:name=".ResultActivity"></activity>
+        <activity android:name=".InputRooftopAreaActivity" />
+        <activity android:name=".CamActivity" />
     </application>
 
 </manifest>

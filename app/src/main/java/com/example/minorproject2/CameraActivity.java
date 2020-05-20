@@ -104,101 +104,11 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
                 preview.addView(mPreview);
 
                 final Activity activity = this;
-                new SpotlightView.Builder(this)
-                        .introAnimationDuration(400)
-                        .enableRevealAnimation(true)
-                        .performClick(true)
-                        .fadeinTextDuration(400)
-                        .headingTvColor(Color.parseColor("#eb273f"))
-                        .headingTvSize(32)
-                        .headingTvText("Images Count")
-                        .subHeadingTvColor(Color.parseColor("#ffffff"))
-                        .subHeadingTvSize(16)
-                        .subHeadingTvText("Here you will know how many images must be taken to ensure the proper analysis.")
-                        .maskColor(Color.parseColor("#dc000000"))
-                        .target(imageCount)
-                        .lineAnimDuration(400)
-                        .lineAndArcColor(Color.parseColor("#eb273f"))
-                        .dismissOnTouch(true)
-                        .dismissOnBackPress(true)
-                        .enableDismissAfterShown(false)
-                        .usageId("imageCoun tutorial") //UNIQUE ID
-                        .setListener(new SpotlightListener() {
-                            @Override
-                            public void onUserClicked(String s) {
-                                new SpotlightView.Builder(activity)
-                                        .introAnimationDuration(400)
-                                        .enableRevealAnimation(true)
-                                        .performClick(true)
-                                        .fadeinTextDuration(400)
-                                        .headingTvColor(Color.parseColor("#eb273f"))
-                                        .headingTvSize(32)
-                                        .headingTvText("Sky Side")
-                                        .subHeadingTvColor(Color.parseColor("#ffffff"))
-                                        .subHeadingTvSize(16)
-                                        .subHeadingTvText("Capture images in a way that this side must be in sky region.")
-                                        .maskColor(Color.parseColor("#dc000000"))
-                                        .target(top)
-                                        .lineAnimDuration(400)
-                                        .lineAndArcColor(Color.parseColor("#eb273f"))
-                                        .dismissOnTouch(true)
-                                        .dismissOnBackPress(true)
-                                        .enableDismissAfterShown(false)
-                                        .usageId("top tutorial") //UNIQUE ID
-                                        .setListener(new SpotlightListener() {
-                                            @Override
-                                            public void onUserClicked(String s) {
-                                                new SpotlightView.Builder(activity)
-                                                        .introAnimationDuration(400)
-                                                        .enableRevealAnimation(true)
-                                                        .performClick(true)
-                                                        .fadeinTextDuration(400)
-                                                        .headingTvColor(Color.parseColor("#eb273f"))
-                                                        .headingTvSize(32)
-                                                        .headingTvText("Bottom Side")
-                                                        .subHeadingTvColor(Color.parseColor("#ffffff"))
-                                                        .subHeadingTvSize(16)
-                                                        .subHeadingTvText("This will be the bottom part of image.")
-                                                        .maskColor(Color.parseColor("#dc000000"))
-                                                        .target(bottom)
-                                                        .lineAnimDuration(400)
-                                                        .lineAndArcColor(Color.parseColor("#eb273f"))
-                                                        .dismissOnTouch(true)
-                                                        .dismissOnBackPress(true)
-                                                        .enableDismissAfterShown(false)
-                                                        .usageId("bottom tutorial") //UNIQUE ID
-                                                        .setListener(new SpotlightListener() {
-                                                            @Override
-                                                            public void onUserClicked(String s) {
-                                                                new SpotlightView.Builder(activity)
-                                                                        .introAnimationDuration(400)
-                                                                        .enableRevealAnimation(true)
-                                                                        .performClick(true)
-                                                                        .fadeinTextDuration(400)
-                                                                        .headingTvColor(Color.parseColor("#eb273f"))
-                                                                        .headingTvSize(32)
-                                                                        .headingTvText("Capture")
-                                                                        .subHeadingTvColor(Color.parseColor("#ffffff"))
-                                                                        .subHeadingTvSize(16)
-                                                                        .subHeadingTvText("Tap here to click picture.")
-                                                                        .maskColor(Color.parseColor("#dc000000"))
-                                                                        .target(capture)
-                                                                        .lineAnimDuration(400)
-                                                                        .lineAndArcColor(Color.parseColor("#eb273f"))
-                                                                        .dismissOnTouch(true)
-                                                                        .dismissOnBackPress(true)
-                                                                        .enableDismissAfterShown(false)
-                                                                        .usageId("click tutorial") //UNIQUE ID
-                                                                        .show();
-                                                            }
-                                                        })
-                                                        .show();
-                                            }
-                                        })
-                                        .show();
-                            }
-                        })
-                        .show();
+                try {
+                    setTutorial(activity);
+                } catch (Exception e) {
+                }
+
                 capture.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -221,13 +131,13 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
                                     images.add(pictureFile.toString());
                                     count++;
                                     if (images.size() == imagesToBeTaken) {
-                                        if (imagesToBeTaken==3)
-                                        { startActivity(new Intent(getApplicationContext(), InputRooftopAreaActivity.class)
-                                                .putExtra("imagesClicked", 3)
-                                                .putExtra("image1", images.get(0))
-                                                .putExtra("image2", images.get(1))
-                                                .putExtra("image3", images.get(2)));
-                                        }else{
+                                        if (imagesToBeTaken == 3) {
+                                            startActivity(new Intent(getApplicationContext(), InputRooftopAreaActivity.class)
+                                                    .putExtra("imagesClicked", 3)
+                                                    .putExtra("image1", images.get(0))
+                                                    .putExtra("image2", images.get(1))
+                                                    .putExtra("image3", images.get(2)));
+                                        } else {
                                             startActivity(new Intent(getApplicationContext(), InputRooftopAreaActivity.class)
                                                     .putExtra("imagesClicked", 4)
                                                     .putExtra("image1", images.get(0))
@@ -239,9 +149,13 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
                                         finish();
                                     } else {
                                         imageCount.setText("Image " + count);
+                                        mCamera.stopPreview();
+                                        mCamera.release();
+                                        mCamera = null;
                                         mCamera = getCameraInstance();
-                                        mPreview = new CameraPreview(getApplicationContext(), mCamera);
-                                        //preview = findViewById(R.id.camera);
+
+                                        mPreview = new CameraPreview(CameraActivity.this, mCamera);
+                                        preview = findViewById(R.id.camera);
                                         preview.addView(mPreview);
                                     }
 
@@ -256,6 +170,104 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
                 });
             }
         }
+    }
+
+    private void setTutorial(final Activity activity) {
+        new SpotlightView.Builder(this)
+                .introAnimationDuration(400)
+                .enableRevealAnimation(true)
+                .performClick(true)
+                .fadeinTextDuration(400)
+                .headingTvColor(Color.parseColor("#eb273f"))
+                .headingTvSize(32)
+                .headingTvText("Images Count")
+                .subHeadingTvColor(Color.parseColor("#ffffff"))
+                .subHeadingTvSize(16)
+                .subHeadingTvText("Here you will know how many images must be taken to ensure the proper analysis.")
+                .maskColor(Color.parseColor("#dc000000"))
+                .target(imageCount)
+                .lineAnimDuration(400)
+                .lineAndArcColor(Color.parseColor("#eb273f"))
+                .dismissOnTouch(true)
+                .dismissOnBackPress(true)
+                .enableDismissAfterShown(false)
+                .usageId("imageCount tutorial") //UNIQUE ID
+                .setListener(new SpotlightListener() {
+                    @Override
+                    public void onUserClicked(String s) {
+                        new SpotlightView.Builder(activity)
+                                .introAnimationDuration(400)
+                                .enableRevealAnimation(true)
+                                .performClick(true)
+                                .fadeinTextDuration(400)
+                                .headingTvColor(Color.parseColor("#eb273f"))
+                                .headingTvSize(32)
+                                .headingTvText("Sky Side")
+                                .subHeadingTvColor(Color.parseColor("#ffffff"))
+                                .subHeadingTvSize(16)
+                                .subHeadingTvText("Capture images in a way that this side must be in sky region.")
+                                .maskColor(Color.parseColor("#dc000000"))
+                                .target(top)
+                                .lineAnimDuration(400)
+                                .lineAndArcColor(Color.parseColor("#eb273f"))
+                                .dismissOnTouch(true)
+                                .dismissOnBackPress(true)
+                                .enableDismissAfterShown(false)
+                                .usageId("top tutorial") //UNIQUE ID
+                                .setListener(new SpotlightListener() {
+                                    @Override
+                                    public void onUserClicked(String s) {
+                                        new SpotlightView.Builder(activity)
+                                                .introAnimationDuration(400)
+                                                .enableRevealAnimation(true)
+                                                .performClick(true)
+                                                .fadeinTextDuration(400)
+                                                .headingTvColor(Color.parseColor("#eb273f"))
+                                                .headingTvSize(32)
+                                                .headingTvText("Bottom Side")
+                                                .subHeadingTvColor(Color.parseColor("#ffffff"))
+                                                .subHeadingTvSize(16)
+                                                .subHeadingTvText("This will be the bottom part of image.")
+                                                .maskColor(Color.parseColor("#dc000000"))
+                                                .target(bottom)
+                                                .lineAnimDuration(400)
+                                                .lineAndArcColor(Color.parseColor("#eb273f"))
+                                                .dismissOnTouch(true)
+                                                .dismissOnBackPress(true)
+                                                .enableDismissAfterShown(false)
+                                                .usageId("bottom tutorial") //UNIQUE ID
+                                                .setListener(new SpotlightListener() {
+                                                    @Override
+                                                    public void onUserClicked(String s) {
+                                                        new SpotlightView.Builder(activity)
+                                                                .introAnimationDuration(400)
+                                                                .enableRevealAnimation(true)
+                                                                .performClick(true)
+                                                                .fadeinTextDuration(400)
+                                                                .headingTvColor(Color.parseColor("#eb273f"))
+                                                                .headingTvSize(32)
+                                                                .headingTvText("Capture")
+                                                                .subHeadingTvColor(Color.parseColor("#ffffff"))
+                                                                .subHeadingTvSize(16)
+                                                                .subHeadingTvText("Tap here to click picture.\nMake sure you are clicking picture in sunlight.")
+                                                                .maskColor(Color.parseColor("#dc000000"))
+                                                                .target(capture)
+                                                                .lineAnimDuration(400)
+                                                                .lineAndArcColor(Color.parseColor("#eb273f"))
+                                                                .dismissOnTouch(true)
+                                                                .dismissOnBackPress(true)
+                                                                .enableDismissAfterShown(false)
+                                                                .usageId("click tutorial") //UNIQUE ID
+                                                                .show();
+                                                    }
+                                                })
+                                                .show();
+                                    }
+                                })
+                                .show();
+                    }
+                })
+                .show();
     }
 
     /**
@@ -305,7 +317,10 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
         Camera c = null;
         try {
             c = Camera.open(); // attempt to get a Camera instance
+            Log.d("TAG", "getCameraInstance: camera open");
+
         } catch (Exception e) {
+            Log.d("TAG", "getCameraInstance: "+e);
             // Camera is not available (in use or does not exist)
         }
         return c; // returns null if camera is unavailable
@@ -320,8 +335,6 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
         public CameraPreview(Context context, Camera camera) {
             super(context);
             mCamera = camera;
-
-
             mHolder = getHolder();
             mHolder.addCallback(this);
             mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -332,6 +345,7 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
             try {
                 mCamera.setPreviewDisplay(holder);
                 mCamera.startPreview();
+
             } catch (IOException e) {
                 Log.d(TAG, "Error setting camera preview: " + e.getMessage());
             }
@@ -343,11 +357,13 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
         public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 
             if (mHolder.getSurface() == null) {
+
                 return;
             }
 
             try {
                 mCamera.stopPreview();
+
             } catch (Exception e) {
             }
 
@@ -359,6 +375,7 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
                 p.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
                 mCamera.setParameters(p);
                 mCamera.startPreview();
+
 
             } catch (Exception e) {
                 Log.d(TAG, "Error starting camera preview: " + e.getMessage());
