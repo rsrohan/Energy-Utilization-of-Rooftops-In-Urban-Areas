@@ -1,12 +1,5 @@
 package com.example.minorproject2;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -17,14 +10,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -38,9 +28,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.wooplr.spotlight.SpotlightView;
 import com.wooplr.spotlight.utils.SpotlightListener;
 
@@ -115,23 +107,37 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
                         progressBar.setVisibility(View.VISIBLE);
                         mCamera.takePicture(null, null, new Camera.PictureCallback() {
                             @Override
-                            public void onPictureTaken(byte[] data, Camera camera) {
-                                File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
+                            public void onPictureTaken(final byte[] data, Camera camera) {
+                                final File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
                                 if (pictureFile == null) {
                                     Log.d(TAG, "Error creating media file, check storage permissions");
                                     return;
                                 }
 
                                 try {
-                                    FileOutputStream fos = new FileOutputStream(pictureFile);
-                                    fos.write(data);
-                                    fos.close();
-                                    //Toast.makeText(CameraActivity.this, "" + pictureFile, Toast.LENGTH_SHORT).show();
+                                    Thread t = new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            FileOutputStream fos = null;
+                                            try {
+                                                fos = new FileOutputStream(pictureFile);
+                                                fos.write(data);
+                                                fos.close();
+                                            } catch (FileNotFoundException e) {
+                                                e.printStackTrace();
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+
+                                        }
+                                    });
+                                    t.start();
                                     progressBar.setVisibility(View.GONE);
                                     images.add(pictureFile.toString());
                                     count++;
                                     if (images.size() == imagesToBeTaken) {
                                         if (imagesToBeTaken == 3) {
+
                                             startActivity(new Intent(getApplicationContext(), InputRooftopAreaActivity.class)
                                                     .putExtra("imagesClicked", 3)
                                                     .putExtra("image1", images.get(0))
@@ -148,21 +154,20 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
 
                                         finish();
                                     } else {
-                                        imageCount.setText("Image " + count);
-                                        mCamera.stopPreview();
-                                        mCamera.release();
-                                        mCamera = null;
-                                        mCamera = getCameraInstance();
 
-                                        mPreview = new CameraPreview(CameraActivity.this, mCamera);
-                                        preview = findViewById(R.id.camera);
-                                        preview.addView(mPreview);
+                                        imageCount.setText("Image " + count);
+                                        camera.startPreview();
+//                                        mCamera.stopPreview();
+//                                        mCamera.release();
+//                                        mCamera = null;
+//                                        mCamera = getCameraInstance();
+//                                        mPreview = new CameraPreview(CameraActivity.this, mCamera);
+//                                        preview = findViewById(R.id.camera);
+//                                        preview.addView(mPreview);
                                     }
 
-                                } catch (FileNotFoundException e) {
+                                } catch (Exception e) {
                                     Log.d(TAG, "File not found: " + e.getMessage());
-                                } catch (IOException e) {
-                                    Log.d(TAG, "Error accessing file: " + e.getMessage());
                                 }
                             }
                         });
