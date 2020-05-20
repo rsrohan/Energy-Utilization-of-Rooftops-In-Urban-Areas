@@ -71,7 +71,7 @@ public class ProfileDialog extends Dialog implements DialogInterface.OnClickList
                         reference.setValue(username.getText().toString()).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(context, "SOMETHING WENT WRONG \n" + e, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "SOMETHING WENT WRONG" + e, Toast.LENGTH_SHORT).show();
                                 save.setVisibility(View.VISIBLE);
                                 message.setText(R.string.entername);
                                 username.setVisibility(View.VISIBLE);

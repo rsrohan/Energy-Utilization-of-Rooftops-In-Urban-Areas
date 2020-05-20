@@ -30,11 +30,7 @@
         <activity android:name=".InputRooftopAreaActivity" />
         <activity android:name=".CamActivity" />
         <activity android:name=".SplashActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".LoginActivity" />
         <activity
@@ -42,7 +38,13 @@
             android:launchMode="singleInstance" />
         <activity
             android:name=".CameraActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

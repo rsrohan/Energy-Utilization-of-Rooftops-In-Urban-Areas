@@ -60,20 +60,22 @@
 
     <View
         android:layout_width="1dp"
-        android:layout_height="match_parent"
+        android:layout_height="300dp"
         android:layout_centerInParent="true"
+        android:id="@+id/line1"
         android:background="@color/colorAccent"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:layout_marginTop="32dp"
+        android:layout_marginEnd="20dp"
         android:text="Image 1"
         android:gravity="center"
         android:textStyle="bold"
         android:background="@drawable/ic_send_text_bg"
         android:textColor="@color/white"
-        android:layout_centerHorizontal="true"
+        android:layout_alignParentEnd="true"
         android:id="@+id/imageCount"/>
     <ImageButton
         android:layout_width="75dp"
@@ -86,4 +88,26 @@
         android:src="@drawable/ic_camera_black_24dp"
         android:background="#00ffffff"
         />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@id/line1"
+        android:layout_marginStart="20dp"
+        android:textColor="@color/colorAccent"
+        android:text="Top side"
+        android:id="@+id/top"
+        android:gravity="center"
+        android:drawableEnd="@drawable/ic_chevron_right_black_24dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="20dp"
+        android:layout_toStartOf="@id/line1"
+        android:textColor="@color/colorAccent"
+        android:text="Bottom side"
+        android:gravity="center"
+        android:id="@+id/bottom"
+        android:drawableStart="@drawable/ic_chevron_left_black_24dp"/>
 </RelativeLayout>

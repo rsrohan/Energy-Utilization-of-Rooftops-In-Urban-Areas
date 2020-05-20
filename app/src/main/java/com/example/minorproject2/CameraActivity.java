@@ -7,9 +7,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -39,6 +41,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.wooplr.spotlight.SpotlightView;
+import com.wooplr.spotlight.utils.SpotlightListener;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -65,6 +69,7 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
     public static ArrayList<String> images = null;
     private FrameLayout preview;
     int imagesToBeTaken;
+    TextView top, bottom;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -79,6 +84,8 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
         progressBar = findViewById(R.id.progressbar);
         compass = findViewById(R.id.compass);
         imageCount = findViewById(R.id.imageCount);
+        top = findViewById(R.id.top);
+        bottom = findViewById(R.id.bottom);
 
 
         imagesToBeTaken = getIntent().getIntExtra("requirement", 4);
@@ -96,6 +103,102 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
                 preview = findViewById(R.id.camera);
                 preview.addView(mPreview);
 
+                final Activity activity = this;
+                new SpotlightView.Builder(this)
+                        .introAnimationDuration(400)
+                        .enableRevealAnimation(true)
+                        .performClick(true)
+                        .fadeinTextDuration(400)
+                        .headingTvColor(Color.parseColor("#eb273f"))
+                        .headingTvSize(32)
+                        .headingTvText("Images Count")
+                        .subHeadingTvColor(Color.parseColor("#ffffff"))
+                        .subHeadingTvSize(16)
+                        .subHeadingTvText("Here you will know how many images must be taken to ensure the proper analysis.")
+                        .maskColor(Color.parseColor("#dc000000"))
+                        .target(imageCount)
+                        .lineAnimDuration(400)
+                        .lineAndArcColor(Color.parseColor("#eb273f"))
+                        .dismissOnTouch(true)
+                        .dismissOnBackPress(true)
+                        .enableDismissAfterShown(false)
+                        .usageId("imageCoun tutorial") //UNIQUE ID
+                        .setListener(new SpotlightListener() {
+                            @Override
+                            public void onUserClicked(String s) {
+                                new SpotlightView.Builder(activity)
+                                        .introAnimationDuration(400)
+                                        .enableRevealAnimation(true)
+                                        .performClick(true)
+                                        .fadeinTextDuration(400)
+                                        .headingTvColor(Color.parseColor("#eb273f"))
+                                        .headingTvSize(32)
+                                        .headingTvText("Sky Side")
+                                        .subHeadingTvColor(Color.parseColor("#ffffff"))
+                                        .subHeadingTvSize(16)
+                                        .subHeadingTvText("Capture images in a way that this side must be in sky region.")
+                                        .maskColor(Color.parseColor("#dc000000"))
+                                        .target(top)
+                                        .lineAnimDuration(400)
+                                        .lineAndArcColor(Color.parseColor("#eb273f"))
+                                        .dismissOnTouch(true)
+                                        .dismissOnBackPress(true)
+                                        .enableDismissAfterShown(false)
+                                        .usageId("top tutorial") //UNIQUE ID
+                                        .setListener(new SpotlightListener() {
+                                            @Override
+                                            public void onUserClicked(String s) {
+                                                new SpotlightView.Builder(activity)
+                                                        .introAnimationDuration(400)
+                                                        .enableRevealAnimation(true)
+                                                        .performClick(true)
+                                                        .fadeinTextDuration(400)
+                                                        .headingTvColor(Color.parseColor("#eb273f"))
+                                                        .headingTvSize(32)
+                                                        .headingTvText("Bottom Side")
+                                                        .subHeadingTvColor(Color.parseColor("#ffffff"))
+                                                        .subHeadingTvSize(16)
+                                                        .subHeadingTvText("This will be the bottom part of image.")
+                                                        .maskColor(Color.parseColor("#dc000000"))
+                                                        .target(bottom)
+                                                        .lineAnimDuration(400)
+                                                        .lineAndArcColor(Color.parseColor("#eb273f"))
+                                                        .dismissOnTouch(true)
+                                                        .dismissOnBackPress(true)
+                                                        .enableDismissAfterShown(false)
+                                                        .usageId("bottom tutorial") //UNIQUE ID
+                                                        .setListener(new SpotlightListener() {
+                                                            @Override
+                                                            public void onUserClicked(String s) {
+                                                                new SpotlightView.Builder(activity)
+                                                                        .introAnimationDuration(400)
+                                                                        .enableRevealAnimation(true)
+                                                                        .performClick(true)
+                                                                        .fadeinTextDuration(400)
+                                                                        .headingTvColor(Color.parseColor("#eb273f"))
+                                                                        .headingTvSize(32)
+                                                                        .headingTvText("Capture")
+                                                                        .subHeadingTvColor(Color.parseColor("#ffffff"))
+                                                                        .subHeadingTvSize(16)
+                                                                        .subHeadingTvText("Tap here to click picture.")
+                                                                        .maskColor(Color.parseColor("#dc000000"))
+                                                                        .target(capture)
+                                                                        .lineAnimDuration(400)
+                                                                        .lineAndArcColor(Color.parseColor("#eb273f"))
+                                                                        .dismissOnTouch(true)
+                                                                        .dismissOnBackPress(true)
+                                                                        .enableDismissAfterShown(false)
+                                                                        .usageId("click tutorial") //UNIQUE ID
+                                                                        .show();
+                                                            }
+                                                        })
+                                                        .show();
+                                            }
+                                        })
+                                        .show();
+                            }
+                        })
+                        .show();
                 capture.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
