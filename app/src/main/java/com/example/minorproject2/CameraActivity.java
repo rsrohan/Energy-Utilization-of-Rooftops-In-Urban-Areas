@@ -1,9 +1,13 @@
 package com.example.minorproject2;
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.hardware.Sensor;
@@ -15,6 +19,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -40,6 +46,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -96,8 +103,14 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
                 preview.addView(mPreview);
 
                 final Activity activity = this;
+
                 try {
-                    setTutorial(activity);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            setTutorial(activity);
+                        }
+                    }, 3000);
                 } catch (Exception e) {
                 }
 
@@ -105,33 +118,39 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
                     @Override
                     public void onClick(View v) {
                         progressBar.setVisibility(View.VISIBLE);
+
                         mCamera.takePicture(null, null, new Camera.PictureCallback() {
                             @Override
                             public void onPictureTaken(final byte[] data, Camera camera) {
-                                final File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
+                                String pictureFile = null;
+                                try {
+                                    pictureFile = getOutputMediaFile(data);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                                 if (pictureFile == null) {
                                     Log.d(TAG, "Error creating media file, check storage permissions");
                                     return;
                                 }
 
-                                try {
-                                    Thread t = new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            FileOutputStream fos = null;
-                                            try {
-                                                fos = new FileOutputStream(pictureFile);
-                                                fos.write(data);
-                                                fos.close();
-                                            } catch (FileNotFoundException e) {
-                                                e.printStackTrace();
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
-                                            }
-
-                                        }
-                                    });
-                                    t.start();
+//                                try {
+//                                    Thread t = new Thread(new Runnable() {
+//                                        @Override
+//                                        public void run() {
+//                                            FileOutputStream fos = null;
+//                                            try {
+//                                                fos = new FileOutputStream(pictureFile);
+//                                                fos.write(data);
+//                                                fos.close();
+//                                            } catch (FileNotFoundException e) {
+//                                                e.printStackTrace();
+//                                            } catch (IOException e) {
+//                                                e.printStackTrace();
+//                                            }
+//
+//                                        }
+//                                    });
+//                                    t.start();
                                     progressBar.setVisibility(View.GONE);
                                     images.add(pictureFile.toString());
                                     count++;
@@ -152,6 +171,9 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
                                                     .putExtra("image4", images.get(3)));
                                         }
 
+                                        try{
+                                            mCamera.release();
+                                        }catch (Exception e){}
                                         finish();
                                     } else {
 
@@ -166,16 +188,15 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
 //                                        preview.addView(mPreview);
                                     }
 
-                                } catch (Exception e) {
-                                    Log.d(TAG, "File not found: " + e.getMessage());
                                 }
-                            }
-                        });
+                            });
+                        };
                     }
-                });
+                );
+                };
             }
         }
-    }
+
 
     private void setTutorial(final Activity activity) {
         new SpotlightView.Builder(this)
@@ -391,39 +412,66 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
 
-    /**
-     * Create a file Uri for saving an image or video
-     */
-    private static Uri getOutputMediaFileUri(int type) {
-        return Uri.fromFile(getOutputMediaFile(type));
-    }
 
-    /**
-     * Create a File for saving an image or video
-     */
-    private static File getOutputMediaFile(int type) {
-
-
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "MyCameraApp");
-
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Log.d("MyCameraApp", "failed to create directory");
-                return null;
-            }
-        }
-
+    private String getOutputMediaFile(byte[] bitmapdata) throws IOException {
+        boolean saved;
+        OutputStream fos;
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_" + timeStamp + ".jpg");
+        Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ContentResolver resolver = getContentResolver();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "IMG_" + timeStamp);
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM/" + "MINOR");
+            Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+            fos = resolver.openOutputStream(imageUri);
+            saved = bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            assert fos != null;
+            fos.flush();
+            fos.close();
+            return imageUri.getPath();
         } else {
-            return null;
+            String imagesDir = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DCIM).toString() + File.separator + "MINOR";
+
+            File file = new File(imagesDir);
+
+            if (!file.exists()) {
+                file.mkdir();
+            }
+
+            File image = new File(imagesDir, "IMG_" + timeStamp + ".png");
+            fos = new FileOutputStream(image);
+            saved = bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            assert fos != null;
+            fos.flush();
+            fos.close();
+            return image.getAbsolutePath();
         }
 
-        return mediaFile;
+
+
+
+//        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "minor");
+//
+//        if (!mediaStorageDir.exists()) {
+//            if (!mediaStorageDir.mkdirs()) {
+//                Log.d("MyCameraApp", "failed to create directory");
+//                return null;
+//            }
+//        }
+//
+//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//        File mediaFile;
+//        if (type == MEDIA_TYPE_IMAGE) {
+//            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+//                    "IMG_" + timeStamp + ".jpg");
+//        } else {
+//            return null;
+//        }
+
     }
 
 
@@ -476,8 +524,10 @@ public class CameraActivity extends AppCompatActivity implements SensorEventList
             Log.d(TAG, "onResume: " + e);
         }
         try {
-            //mCamera = getCameraInstance();
-
+            if (mCamera==null)
+            {
+                mCamera = getCameraInstance();
+            }
         } catch (Exception ignored) {
 
         }

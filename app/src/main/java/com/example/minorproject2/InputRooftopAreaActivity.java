@@ -1,10 +1,12 @@
 package com.example.minorproject2;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -12,6 +14,7 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +25,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -64,6 +71,7 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
     ImageView img1, img2, img3, img4, iv_step;
     HorizontalScrollView scrollView;
     TextView tv_step, tv_retake;
+    Bitmap imagesToUpload[] = new Bitmap[4];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,21 +99,105 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
         imagesCount = getIntent().getIntExtra("imagesClicked", 4);
         if (imagesCount == 3) {
             images.add(getIntent().getStringExtra("image1"));
-            Glide.with(getApplicationContext()).load(images.get(0)).into(img1);
+            Glide.with(getApplicationContext()).asBitmap().load(images.get(0)).listener(new RequestListener<Bitmap>() {
+                @Override
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                    imagesToUpload[0] = resource;
+                    img1.setImageBitmap(resource);
+                    return true;
+                }
+            }).submit();
             images.add(getIntent().getStringExtra("image2"));
-            Glide.with(getApplicationContext()).load(images.get(1)).into(img2);
+            Glide.with(getApplicationContext()).asBitmap().load(images.get(1)).listener(new RequestListener<Bitmap>() {
+                @Override
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                    imagesToUpload[1] = resource;
+                    img2.setImageBitmap(resource);
+                    return true;
+                }
+            }).submit();
             images.add(getIntent().getStringExtra("image3"));
-            Glide.with(getApplicationContext()).load(images.get(2)).into(img3);
+            Glide.with(getApplicationContext()).asBitmap().load(images.get(2)).listener(new RequestListener<Bitmap>() {
+                @Override
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                    imagesToUpload[2] = resource;
+                    img3.setImageBitmap(resource);
+                    return true;
+                }
+            }).submit();
             findViewById(R.id.cvimage4).setVisibility(View.GONE);
         } else {
             images.add(getIntent().getStringExtra("image1"));
-            Glide.with(getApplicationContext()).load(images.get(0)).into(img1);
+            Glide.with(getApplicationContext()).asBitmap().load(images.get(0)).listener(new RequestListener<Bitmap>() {
+                @Override
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                    imagesToUpload[0] = resource;
+                    img1.setImageBitmap(resource);
+                    return true;
+                }
+            }).submit();
             images.add(getIntent().getStringExtra("image2"));
-            Glide.with(getApplicationContext()).load(images.get(1)).into(img2);
+            Glide.with(getApplicationContext()).asBitmap().load(images.get(1)).listener(new RequestListener<Bitmap>() {
+                @Override
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                    imagesToUpload[1] = resource;
+                    img2.setImageBitmap(resource);
+                    return true;
+                }
+            }).submit();
             images.add(getIntent().getStringExtra("image3"));
-            Glide.with(getApplicationContext()).load(images.get(2)).into(img3);
+            Glide.with(getApplicationContext()).asBitmap().load(images.get(2)).listener(new RequestListener<Bitmap>() {
+                @Override
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                    imagesToUpload[2] = resource;
+                    img3.setImageBitmap(resource);
+                    return true;
+                }
+            }).submit();
             images.add(getIntent().getStringExtra("image4"));
-            Glide.with(getApplicationContext()).load(images.get(3)).into(img4);
+            Glide.with(getApplicationContext()).asBitmap().load(images.get(3)).listener(new RequestListener<Bitmap>() {
+                @Override
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                    imagesToUpload[3] = resource;
+                    img4.setImageBitmap(resource);
+                    return true;
+                }
+            }).submit();
 
         }
 
@@ -119,7 +211,12 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
                     progressDialog.show();
                     areaReference.setValue(et_rooftop.getText().toString());
                     et_rooftop.setFocusable(false);
-                    uploadImage();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            uploadImage();
+                        }
+                    });
                 }
             }
         });
@@ -135,35 +232,7 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
 
     }
 
-    private static File getOutputMediaFile(int type) {
-        // To be safe, you should check that the SDCard is mounted
-        // using Environment.getExternalStorageState() before doing this.
 
-        File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "minor");
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
-        // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Log.d("MyCameraApp", "failed to create directory");
-                return null;
-            }
-        }
-
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_" + timeStamp + ".png");
-            s = "IMG_" + timeStamp + ".png";
-        } else {
-            return null;
-        }
-
-        return mediaFile;
-    }
 
     private void uploadImage() {
         FirebaseDatabase.getInstance().getReference(Objects.requireNonNull(user.getPhoneNumber())).child("uploadedCount").setValue(images.size());
@@ -175,14 +244,25 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
             String timeStamp = String.valueOf(System.currentTimeMillis());
             timeStamp = "IMG_"+timeStamp;
 
-            final File imgFile = new File(images.get(i));
             final String extension = images.get(i);
-
+//            Uri selectedImage = Uri.parse(images.get(i));
+//            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+//            Cursor cursor = getContentResolver().query(selectedImage,
+//                    filePathColumn, null, null, null);
+//            Objects.requireNonNull(cursor).moveToFirst();
+//            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+//            String picturePath = cursor.getString(columnIndex);
+//            cursor.close();
+            final File imgFile = new File(images.get(i));
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            imagesToUpload[i].compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            imagesToUpload[i].recycle();
             if (imgFile.exists()) {
                 final StorageReference riversRef = mStorageRef.child(timeStamp + "" + extension.substring(extension.indexOf(".")));
                 try {
                     final String finalTimeStamp = timeStamp;
-                    riversRef.putFile((Uri.fromFile(new File(imgFile.getAbsolutePath()))))
+                    riversRef.putBytes(byteArray)
                             .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                 @Override
                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -286,67 +366,10 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
         result.compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] byteArray = stream.toByteArray();
         //Uri file = Uri.fromFile(new File(result+".png"));
-        final File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
-        if (pictureFile == null) {
-            Log.d(TAG, "Error creating media file, check storage permissions");
-            return;
-        }
-
-        try {
-            FileOutputStream fos = new FileOutputStream(pictureFile);
-            fos.write(byteArray);
-            fos.close();
-            //Toast.makeText(CameraActivity.this, "" + pictureFile, Toast.LENGTH_SHORT).show();
-            final StorageReference riversRef = mStorageRef.child(s);
-
-            progressDialog.dismiss();
-
-            analyseImageButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    if (et_rooftop.getText().toString().length() < 1) {
-                        Toast.makeText(InputRooftopAreaActivity.this, "Enter rooftop area", Toast.LENGTH_SHORT).show();
-                    } else {
-                        progressDialog.show();
-
-                        areaReference.setValue(et_rooftop.getText().toString());
-                        et_rooftop.setFocusable(false);
-                        riversRef.putFile((Uri.fromFile(new File(pictureFile.getAbsolutePath()))))
-                                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        // Get a URL to the uploaded content
-                                        progressDialog.dismiss();
-
-                                        progressDialog.setMessage("Please wait...");
-                                        FirebaseDatabase.getInstance().getReference(Objects.requireNonNull(user.getPhoneNumber())).child("uploadedFromPython").child(s.substring(0, s.indexOf("."))).setValue(s);
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception exception) {
-                                        // Handle unsuccessful uploads
-                                        // ...
-                                        progressDialog.dismiss();
-
-                                        Log.d(TAG, "onFailure: " + exception.getCause());
-                                        Toast.makeText(InputRooftopAreaActivity.this, "" + exception, Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                    }
-
-                }
-            });
 
 
 
 
-        } catch (FileNotFoundException e) {
-            Log.d(TAG, "File not found: " + e.getMessage());
-        } catch (IOException e) {
-            Log.d(TAG, "Error accessing file: " + e.getMessage());
-        }
 
     }
 
