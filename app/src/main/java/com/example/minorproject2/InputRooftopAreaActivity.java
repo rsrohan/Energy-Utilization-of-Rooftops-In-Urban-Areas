@@ -72,6 +72,7 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
     HorizontalScrollView scrollView;
     TextView tv_step, tv_retake;
     Bitmap imagesToUpload[] = new Bitmap[4];
+    private int dismissCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -211,6 +212,7 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
                     progressDialog.show();
                     areaReference.setValue(et_rooftop.getText().toString());
                     et_rooftop.setFocusable(false);
+                    analyseImageButton.setEnabled(false);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -266,10 +268,12 @@ public class InputRooftopAreaActivity extends AppCompatActivity {
                             .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                 @Override
                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    dismissCount++;
                                     // Get a URL to the uploaded content
                                     FirebaseDatabase.getInstance().getReference(Objects.requireNonNull(user.getPhoneNumber())).child("uploadedFromPython").child(finalTimeStamp).setValue(finalTimeStamp + "" + extension.substring(extension.indexOf(".")));
-                                    if (x == imagesCount - 1) {
+                                    if (dismissCount == imagesCount) {
                                         progressDialog.dismiss();
+                                        analyseImageButton.setEnabled(true);
                                         et_rooftop.setVisibility(View.GONE);
                                         scrollView.setVisibility(View.GONE);
                                         tv_step.setText("Done !");

@@ -21,11 +21,12 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/rooftop_logo"
+        android:icon="@drawable/plantify"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/rooftop_logo"
+        android:roundIcon="@drawable/plantify"
         android:supportsRtl="true"
         android:largeHeap="true"
+        android:requestLegacyExternalStorage="true"
         android:hardwareAccelerated="true"
         android:theme="@style/AppTheme">
 

@@ -32,7 +32,7 @@ public class ResultActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         String result = getIntent().getStringExtra("result");
         result = result.substring(2);
-/*jan;13-14-23-25-28-29::feb;13-14-23-24-25-27-28-29::mar;24-25-27::apr;24-27::may;24-27::jun;24-27::jul;24-27::aug;24-27::sep;24-27::oct;24-25-27::nov;13-14-23-24-25-27-28-29::dec;13-14-23-25-28-29*/
+/*jan;::feb;13-14-23-24-25-27-28-29::mar;24-25-27::apr;24-27::may;24-27::jun;24-27::jul;24-27::aug;24-27::sep;24-27::oct;24-25-27::nov;13-14-23-24-25-27-28-29::dec;13-14-23-25-28-29*/
         Log.d("TAG", "onCreate: "+result);
         String s = result;
         ArrayList<String> month = new ArrayList<String>();
