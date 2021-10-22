@@ -9,8 +9,8 @@
     <com.camerakit.CameraKitView
         android:id="@+id/camera"
         android:layout_centerInParent="true"
-        android:layout_width="400dp"
-        android:layout_height="400dp"
+        android:layout_width="420dp"
+        android:layout_height="420dp"
         app:camera_facing="back"
         app:camera_flash="off"
         app:camera_aspectRatio="100"
